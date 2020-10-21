@@ -97,6 +97,10 @@ class DatabaseSeeder extends Seeder
             'parent_id' => $route2->id,
             'module_id' => $module->id
         ]);
+        $this->call([
+            CombosSeeder::class,
+            ProjectSeeder::class,
+        ]);
 
     }
 }

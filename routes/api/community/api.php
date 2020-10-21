@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Community\combosController;
+use App\Http\Controllers\Community\projectsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,3 +15,9 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+Route::get('/combo', [combosController::class, 'show']);
+
+Route::get('/project', [projectsController::class, 'show']);
+
+Route::post('/project', [projectsController::class, 'create']);
+
