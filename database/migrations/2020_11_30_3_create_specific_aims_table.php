@@ -16,7 +16,7 @@ class CreateSpecificAimsTable extends Migration
         Schema::connection('pgsql-community')->create('specific_aims', function (Blueprint $table) {
             $table->id();
             $table->foreignId('state_id')->constrained('ignug.states');
-            $table->foreignId('project_id')->connstrained('vinculacion.projects');
+            $table->foreignId('project_id')->connstrained('community.projects');
             $table->text('indicator');
             $table->json('verifications')->nullable();
             $table->text('description')->nullable();//linea base

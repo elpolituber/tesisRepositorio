@@ -27,7 +27,7 @@ class CreateProjectsTable extends Migration
             $table->string('aim',100);//objeto
             $table->foreignId('fraquency_id')->constrained('ignug.catalogues');//frecuencia de actividades
             $table->json('cycle')->nullable();//ciclo
-            $table->foreignId('location_id')->constrained('ignug.catalogues');//crear tabla de localizacion fk
+            $table->foreignId('location_id')->nullable()->constrained('ignug.catalogues');//crear tabla de localizacion fk
             $table->integer('lead_time');//plazo de ejecucion
             $table->date('delivery_date')->nullable();// tiempo
             $table->date('start_date')->nullable();// tiempo
@@ -45,9 +45,9 @@ class CreateProjectsTable extends Migration
             $table->string('develope_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,)
             $table->string('revisado_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,)
             $table->string('firmadopor_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,) */
-            $table->foreignId('rector_id')->constrained('vinculacion.authorities');//rector
-            $table->foreignId('coordinador_id')->constrained('vinculacion.authorities');//coodinador de carrera
-            $table->foreignId('coordinador_vinculacion_id')->constrained('vinculacion.authorities');//coodinador de carrera vinculacion
+            $table->foreignId('rector_id')->nullable()->constrained('community.authorities');//rector
+            $table->foreignId('coordinador_id')->nullable()->constrained('community.authorities');//coodinador de carrera
+            $table->foreignId('coordinador_vinculacion_id')->nullable()->constrained('community.authorities');//coodinador de carrera vinculacion
 
             $table->json('bibliografia')->nullable();//pendiente
             //$table->string('schedules')->constrained('ignug.files');//cronograma

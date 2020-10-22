@@ -19,7 +19,7 @@ class CreateCharitableInstitutionsTable extends Migration
             $table->foreignId('state_id')->constrained('ignug.states');
             $table->string('ruc',15);
             $table->text('name',300);
-            $table->foreignId('location_id')->constrained('ignug.catalogues');//fk propia
+            $table->foreignId('location_id')->nullable()->constrained('ignug.catalogues');//fk propia
             $table->json('indirect_beneficiaries')->nullable();
             $table->string('legal_representative_name',100);
             $table->string('legal_representative_lastname',100);

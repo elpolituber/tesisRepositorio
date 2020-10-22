@@ -10,31 +10,28 @@ use App\Models\Community\SpecificAim;
 use App\Models\Community\ProjectActivities;
 use App\Models\Community\StudentParticipant;
 use App\Models\Community\TeacherParticipant;
-
-use App\Models\Image;
-use App\Models\File;
-use Mockery\Matcher\Type;
+use App\Models\Ignug\Catalogue;
 
 class projectsController extends Controller
 {
   public function show(){
-    $char=Project::join('vinculacion.charitable_institutions','projects.charitable_institution_id','=','charitable_institutions.id')
-    ->join('ignug.careers','ignug.careers.id','=','vinculacion.projects.career_id')
+    $char=Project::join('community.charitable_institutions','projects.charitable_institution_id','=','charitable_institutions.id')
+    ->join('ignug.careers','ignug.careers.id','=','community.projects.career_id')
     ->join('ignug.catalogues','ignug.careers.modality_id','=','ignug.catalogues.id')
-    ->join('ignug.locations','charitable_institutions.location_id','locations.id')
+ //   ->join('ignug.locations','charitable_institutions.location_id','locations.id')
     ->get([
       'projects.id as project_id',
       'charitable_institutions.name as name_institution',
       'charitable_institutions.ruc',
-      "locations.id as location__id_charitable_institutions ",
-      "locations.parent_code_id",
-      "locations.code as location_code_charitable_institutions",
-      "locations.name as location_name_charitable_institutions",
-      "locations.type as location_type_charitable_institutions",
-      "locations.principal_street",
-      "locations.secondary_street",
-      "locations.number as location_number_charitable_institutions",
-      "locations.post_code as location_post_code_charitable_institutions",
+    //  "locations.id as location__id_charitable_institutions ",
+    //  "locations.parent_code_id",
+    //  "locations.code as location_code_charitable_institutions",
+    //  "locations.name as location_name_charitable_institutions",
+    //  "locations.type as location_type_charitable_institutions",
+    //  "locations.principal_street",
+    //  "locations.secondary_street",
+    //  "locations.number as location_number_charitable_institutions",
+    //  "locations.post_code as location_post_code_charitable_institutions",
       'indirect_beneficiaries',
       'legal_representative_name',
       'legal_representative_lastname',
@@ -135,12 +132,18 @@ class projectsController extends Controller
    
    for($con=0;$con<count($request->type_id_specific);$con++){
     $fkaims=$request->parent_code_id[$con] <> null ? SpecificAim::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
-    $projectcontrol->aimsCreate($fkProject->id,$request->type_id_specific[$con],$request->descripcion[$con],$request->indicator[$con],$request->verifications[$con],$fkaims->id);  
+    $projectcontrol->aimsCreate(
+    $fkProject->id,
+    $request->type_id_specific[$con],
+    $request->description_aims[$con],
+    $request->indicator[$con],
+    $request->verifications[$con],
+    $fkaims->id);  
    }
   //ProjectActivities
-   for($con=0;$con<count($request->type_id_Activities);$con++){
+/*    for($con=0;$con<count($request->type_id_Activities);$con++){
     $projectcontrol->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
-   }
+   } */
    //
 
    return true; 
@@ -196,7 +199,7 @@ class projectsController extends Controller
   }
 
   public function creador(Request $request){
-    $vista=SpecificAim::all();
+    $vista=Catalogue::all();
     return $vista;
   }
 

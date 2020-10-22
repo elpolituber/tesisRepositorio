@@ -9,6 +9,8 @@ use App\Models\Authentication\User;
 use App\Models\Ignug\Catalogue;
 use Illuminate\Database\Seeder;
 use App\Models\Ignug\State;
+//use Database\seeders\CombosSeeder;
+// use Database\Seeders\ProjectSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -76,7 +78,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $roles = Role::all();
-        foreach ($roles as $role) {
+        /* foreach ($roles as $role) {
             Permission::factory()->create([
                 'route_id' => $route1->id,
                 'role_id' => $role->id,
@@ -86,7 +88,7 @@ class DatabaseSeeder extends Seeder
                 'route_id' => $route2->id,
                 'role_id' => $role->id,
             ]);
-        }
+        } */
 
         Route::factory()->times(5)->create([
             'parent_id' => $route1->id,
@@ -97,9 +99,10 @@ class DatabaseSeeder extends Seeder
             'parent_id' => $route2->id,
             'module_id' => $module->id
         ]);
-        $this->call([
-            CombosSeeder::class,
-            ProjectSeeder::class,
+
+         $this->call([
+             CombosSeeder::class,
+             ProjectSeeder::class,
         ]);
 
     }
