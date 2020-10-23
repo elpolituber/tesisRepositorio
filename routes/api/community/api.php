@@ -19,5 +19,9 @@ Route::get('/combo', [combosController::class, 'show']);
 
 Route::get('/project', [projectsController::class, 'show']);
 Route::get('/creator', [projectsController::class, 'creador']);
+
 Route::post('/project', [projectsController::class, 'create']);
+
+Route::delete('project/{id}',[projectsController::class, 'destroy']);
+
 

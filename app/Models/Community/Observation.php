@@ -4,9 +4,8 @@ namespace App\Models\Community;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProjectActivities extends Model
+class Observation extends Model
 {
-   // use \OwenIt\Auditing\Auditable;
-    //
+    // ads
     protected $connection = 'pgsql-community';
 }

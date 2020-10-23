@@ -10,7 +10,9 @@ use App\Models\Community\SpecificAim;
 use App\Models\Community\ProjectActivities;
 use App\Models\Community\StudentParticipant;
 use App\Models\Community\TeacherParticipant;
+use App\Models\Community\Observation;
 use App\Models\Ignug\Catalogue;
+use Illuminate\Support\Facades\DB;
 
 class projectsController extends Controller
 {
@@ -141,10 +143,9 @@ class projectsController extends Controller
     $fkaims->id);  
    }
   //ProjectActivities
-/*    for($con=0;$con<count($request->type_id_Activities);$con++){
+    for($con=0;$con<count($request->type_id_activities);$con++){
     $projectcontrol->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
-   } */
-   //
+   } 
 
    return true; 
   }
@@ -188,14 +189,28 @@ class projectsController extends Controller
     $Teacher->save();
   }
 
-  public function destroy(Project $project){
-    DB::table('project_activities')->where('project_id', $project)->delete();
-    DB::table('student_id')->where('project_id', $project)->delete();
-    DB::table('teacher_participants')->where('project_id', $project)->delete();
-    DB::table('specific_aims')->where('project_id', $project)->delete();
-    DB::table('observation')->where('project_id', $project)->delete();
-    DB::table('projects')->where('id', $project)->delete();
-    return true;
+  public function destroy($id){
+    if(!!ProjectActivities::where('project_id',$id)){
+      DB::connection('pgsql-community')->table('project_activities')->where('project_id', $id)->delete();
+    } 
+    if(!!StudentParticipant::where('project_id',$id)){ 
+      DB::connection('pgsql-community')->table('student_participants')->where('project_id', $id)->delete();
+    }  
+    if(!!TeacherParticipant::where('project_id',$id)){
+      DB::connection('pgsql-community')->table('teacher_participants')->where('project_id', $id)->delete();
+    }
+    if(!!SpecificAim::where('project_id',$id)){
+      DB::connection('pgsql-community')->table('specific_aims')->where('project_id', $id)->delete();
+    }
+    /* if(!!Observation::where('project_id',$id)){ 
+      DB::connection('pgsql-community')->table('observations')->where('project_id', $id)->delete();
+    } */
+    if(!!Project::find($id)){
+      DB::connection('pgsql-community')->table('projects')->where('id', $id)->delete();
+    }else{
+      return "No existe el proyecto";
+    }
+      return "proyecto eliminado";
   }
 
   public function creador(Request $request){
