@@ -13,4 +13,9 @@ class CharitableInstitution extends Model
         'indirect_beneficiaries'=>'array',
         'direct_beneficiaries'=>'array',
     ];
+    public function images()
+    {
+        return $this->morphMany(Image::class, 'imageable');
+    }
+
 }

@@ -11,8 +11,8 @@ use App\Models\Community\ProjectActivities;
 use App\Models\Community\StudentParticipant;
 use App\Models\Community\TeacherParticipant;
 use App\Models\Community\Observation;
-use App\Models\Ignug\Catalogue;
 use App\Models\Ignug\Career;
+use App\Models\Ignug\Image;
 use Illuminate\Support\Facades\DB;
 
 class projectsController extends Controller
@@ -35,14 +35,7 @@ class projectsController extends Controller
  }
 
  public function create(Request $request){
-  //img and file
- /*  $Image=new Image;
-  $Image->logo=$request->logo;
-  $File=new File;
-  $File->COMPANYATTACHEDFILES=$request->COMPANYATTACHEDFILES;
-  $File->schedules=$request->schedules;//cronograma */
-  //fk image and file
- 
+  
   //CharatableInstitution
    $CharitableInstitution= new CharitableInstitution; 
    $CharitableInstitution->state_id=1;
@@ -108,6 +101,17 @@ class projectsController extends Controller
     for($con=0;$con<count($request->type_id_activities);$con++){
     $projectcontrol->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
    } 
+  //img 
+  /* $filePath = $request->logo->storeAs('charitable_institution',  $fkCharitableInstitution->name. '.png', 'public');
+  $images= new Image;
+  $images->code=$fkCharitableInstitution->ruc;
+  $images->name=$fkCharitableInstitution->name;
+  $images->description='Este es para el uso de los pdf de vinculacion';
+  $images->uri=$filePath;
+  $images->type=Image::AVATAR_TYPE;
+  $images->state_id=1;
+  $images->save(); */
+
 
    return true; 
   }
