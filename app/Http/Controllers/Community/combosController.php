@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Community;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Community\Project;
 use Illuminate\Http\Request;
 use App\Models\Ignug\Career;
 use App\Models\Ignug\Catalogue;
@@ -24,6 +24,8 @@ class combosController extends Controller
     $bondingActivities=Catalogue::where('type','bonding_activities')->get(["name","id"]);//Actividad de vinculación
     $researchAreas=Catalogue::where('type','research_areas')->get(["name","id"]);//rea de investigacion
     $aims=Catalogue::where('type','aims')->get(["name","id"]);
+    $funtionTeacher=Catalogue::where('type','funtion_vinculacion')->get(["name","id"]);
+    $status=Catalogue::where('type','status_vinculacion')->get(["name","id"]);
     $combos=array(
         //"academiPreriod"=>$academiPreriod,
         "career"=>$career,
@@ -35,11 +37,22 @@ class combosController extends Controller
         "fraquencyOfActivity"=>$fraquencyOfActivity,
         "research_areas"=>$researchAreas,
         "aims"=>$aims,
+        "teacher_funtion"=>$funtionTeacher,
+        "status"=>$status,
         //"Catalogue"=>$catalogue,
        
       );
     return $combos;
  }
-
+ public function create(Request $request){
+    $value=Catalogue::where('type',$request->type.'_vinculacion')->count();
+    $catalogue= new Catalogue;
+    $catalogue->code =$value+1;
+    $catalogue->name = $request->name;
+    $catalogue->type = $request->type->values."_vinculacion";//revisar
+    $catalogue->state_id=1 ;
+    $catalogue->save();
+    return Catalogue::where('type',$request->type.'_vinculacion')->get();
+ }
 
 }

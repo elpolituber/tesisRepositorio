@@ -12,64 +12,26 @@ use App\Models\Community\StudentParticipant;
 use App\Models\Community\TeacherParticipant;
 use App\Models\Community\Observation;
 use App\Models\Ignug\Catalogue;
+use App\Models\Ignug\Career;
 use Illuminate\Support\Facades\DB;
 
 class projectsController extends Controller
 {
   public function show(){
-    $char=Project::join('community.charitable_institutions','projects.charitable_institution_id','=','charitable_institutions.id')
-    ->join('ignug.careers','ignug.careers.id','=','community.projects.career_id')
-    ->join('ignug.catalogues','ignug.careers.modality_id','=','ignug.catalogues.id')
- //   ->join('ignug.locations','charitable_institutions.location_id','locations.id')
-    ->get([
-      'projects.id as project_id',
-      'charitable_institutions.name as name_institution',
-      'charitable_institutions.ruc',
-    //  "locations.id as location__id_charitable_institutions ",
-    //  "locations.parent_code_id",
-    //  "locations.code as location_code_charitable_institutions",
-    //  "locations.name as location_name_charitable_institutions",
-    //  "locations.type as location_type_charitable_institutions",
-    //  "locations.principal_street",
-    //  "locations.secondary_street",
-    //  "locations.number as location_number_charitable_institutions",
-    //  "locations.post_code as location_post_code_charitable_institutions",
-      'indirect_beneficiaries',
-      'legal_representative_name',
-      'legal_representative_lastname',
-      'legal_representative_identification',
-      'project_post_charge',
-      'direct_beneficiaries',
-      'careers.id as careers_id',
-      "careers.name as careers_name",
-      "catalogues.name as modality",
-      'projects.code as project_code',
-      'projects.name as projects_name',
-      'field',
-      'aim',
-      'cycle',
-      'lead_time',
-      'delivery_date',
-      'start_date',
-      'projects.description as description_project',
-      'coordinator_name',
-      'coordinator_lastname',
-      'coordinator_postition',
-      'coordinator_funtion',
-      'introduction',
-      'situational_analysis',
-      'foundamentation',
-      'justification',
-      'bibliografia',
-      //'schedules'
-     // 'location_id,name as licalitation',
-      //'fraquency_id.name as fraquency_id_name'
-      //'status_id.name as status_name',
-      //'assigned_line_id.name as assigned_line_id'
-      //
-    ]);
-    
-    return $char;
+    $project_env=array();
+    $project_last=Project::select('id')->get()->last();
+    for ($i=1; $i <= $project_last->id; $i++) { 
+      $project=Project::find($i);
+      $assigned_line=Project::find($i)->assigned_line;
+      $fraquencyOfActivity=Project::find($i)->fraquency;
+      $status=Project::find($i)->status;
+      $project["assigned_line_id"]=$assigned_line->name;
+      $project["fraquency_id"]=$fraquencyOfActivity->name;
+      $project["status_id"]=$status->name;
+      $project["charitable_institution_id"]=Project::find($i)->first()->CharitableInstitution;
+      $project_env[]=$project;
+    }
+    return $project_env;
  }
 
  public function create(Request $request){
@@ -190,31 +152,65 @@ class projectsController extends Controller
   }
 
   public function destroy($id){
-    if(!!ProjectActivities::where('project_id',$id)){
+    if(!!ProjectActivities::where('project_id',$id)->get()){
       DB::connection('pgsql-community')->table('project_activities')->where('project_id', $id)->delete();
     } 
-    if(!!StudentParticipant::where('project_id',$id)){ 
+    if(!!StudentParticipant::where('project_id',$id)->get()){ 
       DB::connection('pgsql-community')->table('student_participants')->where('project_id', $id)->delete();
     }  
-    if(!!TeacherParticipant::where('project_id',$id)){
+    if(!!TeacherParticipant::where('project_id',$id)->get()){
       DB::connection('pgsql-community')->table('teacher_participants')->where('project_id', $id)->delete();
     }
-    if(!!SpecificAim::where('project_id',$id)){
+    if(!!SpecificAim::where('project_id',$id)->get()){
       DB::connection('pgsql-community')->table('specific_aims')->where('project_id', $id)->delete();
     }
-    /* if(!!Observation::where('project_id',$id)){ 
+    /* if(!!Observation::where('project_id',$id)->get()){ 
       DB::connection('pgsql-community')->table('observations')->where('project_id', $id)->delete();
     } */
-    if(!!Project::find($id)){
+    if(!!Project::find($id)->get()){
       DB::connection('pgsql-community')->table('projects')->where('id', $id)->delete();
     }else{
       return "No existe el proyecto";
     }
       return "proyecto eliminado";
   }
+  public function edit($id){
+    
+    $project=Project::where("id",$id)->first();
+    $assigned_line=Project::find($id)->assigned_line;
+    $fraquencyOfActivity=Project::find($id)->fraquency;
+    $status=Project::find($id)->status;
+   //sustitucion de datos 
+    $project["career_id"]=Career::where('careers.id',$project->career_id)
+    ->join('catalogues','careers.modality_id','=','catalogues.id')
+    ->first(["careers.id","careers.name","catalogues.name as modality"]);
+    $project["assigned_line_id"]=$assigned_line->name;
+    $project["fraquency_id"]=$fraquencyOfActivity->name;
+    $project["status_id"]=$status->name;
+    $project["charitable_institution_id"]=Project::find($id)->first()->CharitableInstitution; //CharitableInstitution::where("id",$project->charitable_institution_id)->first();
+   //nuevos datos de otras tablas 
+    $studentParticipant=StudentParticipant::where("project_id",$id)->get();
+    $teacherParticipant=TeacherParticipant::where("project_id",$id)->get();
+    $specificAim=SpecificAim::where("project_id",$id)->get();
+    $projectActivities=ProjectActivities::where("project_id",$id)->get();
+    //$observation=Observation::where('project_id',$id)->get();
+    $pdf= array(
+      'project'=>$project,
+      'studentParticipant'=>$studentParticipant,
+      'teacherParticipant'=>$teacherParticipant,
+      'specificAim'=>$specificAim,
+      'projectActivities'=>$projectActivities,
+      //'observation'=>$observation,
+
+    );
+    
+    
+    return $pdf;
+    
+   }
 
   public function creador(Request $request){
-    $vista=Catalogue::all();
+    $vista=Project::all();
     return $vista;
   }
 

@@ -15,29 +15,79 @@ class CombosSeeder extends Seeder
      */
     public function run()
     {
+            //status
+            Catalogue::factory()->create([
+                'code' => '1',
+                'name' => 'en proceso',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '2',
+                'name' => 'pendiente',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '3',
+                'name' => 'ractificar',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '4',
+                'name' => 'corregido',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '5',
+                'name' => 'aprobado',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '6',
+                'name' => 'culminado',
+                'type' => 'status_vinculacion',
+                'state_id' => 1,
+            ]);
+            //funcion teacher
+            Catalogue::factory()->create([
+                'code' => '1',
+                'name' => 'tutor',
+                'type' => 'funtion_vinculacion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '2',
+                'name' => 'cordinador',
+                'type' => 'funtion_vinculacion',
+                'state_id' => 1,
+            ]);
             //FraquencyOfActivity Frecuencia de actividades
             Catalogue::factory()->create([
                 'code' => '1',
                 'name' => 'Diaria',
-                'type' => 'fraquency_Activity',
+                'type' => 'fraquency_activity',
                 'state_id' => 1,
             ]);
             Catalogue::factory()->create([
                 'code' => '2',
                 'name' => 'Semanal',
-                'type' => 'fraquency_Activity',
+                'type' => 'fraquency_activity',
                 'state_id' => 1,
             ]);
             Catalogue::factory()->create([
                 'code' => '3',
                 'name' => 'Quincenal',
-                'type' => 'fraquency_Activity',
+                'type' => 'fraquency_activity',
                 'state_id' => 1,
             ]);
             Catalogue::factory()->create([
                 'code' => '4',
                 'name' => 'Mensual',
-                'type' => 'fraquency_Activity',
+                'type' => 'fraquency_activity',
                 'state_id' => 1,
             ]);
             //AssignedLine 

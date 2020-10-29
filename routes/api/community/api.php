@@ -16,11 +16,13 @@ use App\Http\Controllers\Community\projectsController;
 |
 */
 Route::get('/combo', [combosController::class, 'show']);
-
 Route::get('/project', [projectsController::class, 'show']);
+Route::get('/project/{id}', [projectsController::class, 'edit']);
 Route::get('/creator', [projectsController::class, 'creador']);
 
 Route::post('/project', [projectsController::class, 'create']);
+Route::post('/combo', [combosController::class, 'create']);
+
 
 Route::delete('project/{id}',[projectsController::class, 'destroy']);
 

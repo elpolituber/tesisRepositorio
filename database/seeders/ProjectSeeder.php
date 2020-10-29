@@ -208,7 +208,7 @@ class ProjectSeeder extends Seeder
 
     /* 
     {
-		"ruc": "1234567891",
+	"ruc": "1234567891",
     "name_institution": "FUNDACION VISTA PARA TODOS",
     "location_id": 1,
     "indirect_beneficiaries": ["jesus","pepe","marcos"],
@@ -245,10 +245,10 @@ class ProjectSeeder extends Seeder
     "indicator": ["Número de estudiantes capacidades en el área de informática","horas"],
     "verifications": [["Listado de asistencia"],["adios"]],
     "description_aims": ["Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo","describir lo que se hace"],
-    "type_id_specific": [78,"79"],
-    "parent_code_id": [null,"Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo"]
-    "type_id_activities":[1,2],
-    "detail_activities":[null,"hola mundo los destalles en caso de ser otros"],
+    "type_id_specific": [42,"43"],
+    "parent_code_id": [null,"Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo"],
+    "type_id_activities":[8,9],
+    "detail_activities":["hacer cosas","hacer otras cosas"]
     //pendientes por creacion de catalagos
     "$id_student":[1,2],
     "$funtion_student":[1,2],
