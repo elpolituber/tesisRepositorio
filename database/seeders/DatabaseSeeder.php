@@ -9,8 +9,7 @@ use App\Models\Authentication\User;
 use App\Models\Ignug\Catalogue;
 use Illuminate\Database\Seeder;
 use App\Models\Ignug\State;
-//use Database\seeders\CombosSeeder;
-// use Database\Seeders\ProjectSeeder;
+
 
 class DatabaseSeeder extends Seeder
 {

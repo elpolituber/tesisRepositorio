@@ -12,12 +12,14 @@ use App\Models\Community\StudentParticipant;
 use App\Models\Community\TeacherParticipant;
 use App\Models\Community\Observation;
 use App\Models\Ignug\Career;
+use App\Models\Ignug\Catalogue;
 use App\Models\Ignug\Image;
 use Illuminate\Support\Facades\DB;
 
 class projectsController extends Controller
 {
   public function show(){
+    
     $project_env=array();
     $project_last=Project::select('id')->get()->last();
     for ($i=1; $i <= $project_last->id; $i++) { 
@@ -39,9 +41,9 @@ class projectsController extends Controller
   //CharatableInstitution
    $CharitableInstitution= new CharitableInstitution; 
    $CharitableInstitution->state_id=1;
-   $CharitableInstitution->ruc=$request->ruc;
-   $CharitableInstitution->name=$request->name_institution;
-   $CharitableInstitution->location_id=$request->location_id;
+   $CharitableInstitution->ruc=  $request->ruc;
+   $CharitableInstitution->name= $request->name_institution;
+   $CharitableInstitution->location_id= $request->location_id;
    $CharitableInstitution->indirect_beneficiaries=$request->indirect_beneficiaries;
    $CharitableInstitution->legal_representative_name=$request->legal_representative_name;
    $CharitableInstitution->legal_representative_lastname=$request->legal_representative_lastname;
@@ -90,19 +92,20 @@ class projectsController extends Controller
    for($con=0;$con<count($request->type_id_specific);$con++){
     $fkaims=$request->parent_code_id[$con] <> null ? SpecificAim::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
     $projectcontrol->aimsCreate(
-    $fkProject->id,
-    $request->type_id_specific[$con],
-    $request->description_aims[$con],
-    $request->indicator[$con],
-    $request->verifications[$con],
-    $fkaims->id);  
+      $fkProject->id,
+      $request->type_id_specific[$con],
+      $request->description_aims[$con],
+      $request->indicator[$con],
+      $request->verifications[$con],
+      $fkaims->id
+    );  
    }
   //ProjectActivities
     for($con=0;$con<count($request->type_id_activities);$con++){
     $projectcontrol->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
    } 
   //img 
-  /* $filePath = $request->logo->storeAs('charitable_institution',  $fkCharitableInstitution->name. '.png', 'public');
+  /*$filePath = $request->logo->storeAs('charitable_institution',  $fkCharitableInstitution->name. '.png', 'public');
   $images= new Image;
   $images->code=$fkCharitableInstitution->ruc;
   $images->name=$fkCharitableInstitution->name;
@@ -184,7 +187,10 @@ class projectsController extends Controller
     $assigned_line=Project::find($id)->assigned_line;
     $fraquencyOfActivity=Project::find($id)->fraquency;
     $status=Project::find($id)->status;
-   //sustitucion de datos 
+   //sustitucion de datos Carrera modelo fk belongto Catalogue
+   /*
+   
+   */
     $project["career_id"]=Career::where('careers.id',$project->career_id)
     ->join('catalogues','careers.modality_id','=','catalogues.id')
     ->first(["careers.id","careers.name","catalogues.name as modality"]);
@@ -214,7 +220,7 @@ class projectsController extends Controller
    }
 
   public function creador(Request $request){
-    $vista=Project::all();
+    $vista=Catalogue::all();
     return $vista;
   }
 
