@@ -41,14 +41,9 @@ class CreateProjectsTable extends Migration
             $table->text('situational_analysis',300);//ANALISIS SITUACIONAL (DIAGNOSTICO)
             $table->text('foundamentation');
             $table->text('justification');
-            /* $table->string('authorizedBy_id',200);//fk un tabla intermedia autoridades(enlazada con autitication.user cargo ,fecha de asignacion,fecha teminacion,)
-            $table->string('develope_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,)
-            $table->string('revisado_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,)
-            $table->string('firmadopor_id',200);//fk un tabla intermedia autoridades(enlazada con user cargo ,fecha de asignacion,fecha teminacion,) */
             $table->foreignId('rector_id')->nullable()->constrained('community.authorities');//rector
             $table->foreignId('coordinador_id')->nullable()->constrained('community.authorities');//coodinador de carrera
             $table->foreignId('coordinador_vinculacion_id')->nullable()->constrained('community.authorities');//coodinador de carrera vinculacion
-
             $table->json('bibliografia')->nullable();//pendiente
             //$table->string('schedules')->constrained('ignug.files');//cronograma
 

@@ -21,7 +21,11 @@ class projectsController extends Controller
   public function show(){
     
     $project_env=array();
+
     $project_last=Project::select('id')->get()->last();
+    //$project_last=Project::select('id')->where('profesor',$id)->count();
+    //$project_last=Project::select('id')->where('career_id',$id)->count();
+    
     for ($i=1; $i <= $project_last->id; $i++) { 
       $project=Project::find($i);
       $assigned_line=Project::find($i)->assigned_line;
@@ -31,6 +35,9 @@ class projectsController extends Controller
       $project["fraquency_id"]=$fraquencyOfActivity->name;
       $project["status_id"]=$status->name;
       $project["charitable_institution_id"]=Project::find($i)->first()->CharitableInstitution;
+      $project["career_id"]=Career::where('careers.id',$project->career_id)
+      ->join('catalogues','careers.modality_id','=','catalogues.id')
+      ->first(["careers.id","careers.name","catalogues.name as modality"]);
       $project_env[]=$project;
     }
     return $project_env;
@@ -40,6 +47,7 @@ class projectsController extends Controller
   
   //CharatableInstitution
    $CharitableInstitution= new CharitableInstitution; 
+
    $CharitableInstitution->state_id=1;
    $CharitableInstitution->ruc=  $request->ruc;
    $CharitableInstitution->name= $request->name_institution;
@@ -87,11 +95,10 @@ class projectsController extends Controller
    //fk Project searh
    $fkProject=Project::where('code',$request->code)->first("id");
    //SpecificAim
-   $projectcontrol= new projectsController;
    
    for($con=0;$con<count($request->type_id_specific);$con++){
     $fkaims=$request->parent_code_id[$con] <> null ? SpecificAim::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
-    $projectcontrol->aimsCreate(
+    $this->aimsCreate(
       $fkProject->id,
       $request->type_id_specific[$con],
       $request->description_aims[$con],
@@ -102,7 +109,7 @@ class projectsController extends Controller
    }
   //ProjectActivities
     for($con=0;$con<count($request->type_id_activities);$con++){
-    $projectcontrol->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
+    $this->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
    } 
   //img 
   /*$filePath = $request->logo->storeAs('charitable_institution',  $fkCharitableInstitution->name. '.png', 'public');
@@ -188,9 +195,6 @@ class projectsController extends Controller
     $fraquencyOfActivity=Project::find($id)->fraquency;
     $status=Project::find($id)->status;
    //sustitucion de datos Carrera modelo fk belongto Catalogue
-   /*
-   
-   */
     $project["career_id"]=Career::where('careers.id',$project->career_id)
     ->join('catalogues','careers.modality_id','=','catalogues.id')
     ->first(["careers.id","careers.name","catalogues.name as modality"]);

@@ -26,10 +26,11 @@ class combosController extends Controller
     $aims=Catalogue::where('type','aims')->get(["name","id"]);
     $funtionTeacher=Catalogue::where('type','funtion_vinculacion')->get(["name","id"]);
     $status=Catalogue::where('type','status_vinculacion')->get(["name","id"]);
+    
     $combos=array(
         //"academiPreriod"=>$academiPreriod,
-        "career"=>$career,
-        "mode"=>$mode,
+        "career"=> $this->arraytolower($career),
+        "mode"=>$this->arraytolower($mode),
         "meansOfVerification"=>$meansOfVerification,
         "assignedLine"=>$assignedLine,
         "linkageAxes"=>$linkageAxes,
@@ -39,20 +40,42 @@ class combosController extends Controller
         "aims"=>$aims,
         "teacher_funtion"=>$funtionTeacher,
         "status"=>$status,
-        //"Catalogue"=>$catalogue,
-       
       );
     return $combos;
  }
  public function create(Request $request){
     $value=Catalogue::where('type',$request->type.'_vinculacion')->count();
+    $type=$request->type."_vinculacion";
     $catalogue= new Catalogue;
     $catalogue->code =$value+1;
     $catalogue->name = $request->name;
-    $catalogue->type = $request->type->values."_vinculacion";//revisar
+    $catalogue->type = $type;//revisar
     $catalogue->state_id=1 ;
     $catalogue->save();
     return Catalogue::where('type',$request->type.'_vinculacion')->get();
  }
+ 
 
+ public function arraytolower($array, $include_leys=false) {
+  
+  if($include_leys) {
+    foreach($array as $key => $value) {
+      if(is_array($value))
+        $array2[strtolower($key)] = $this->arraytolower($value, $include_leys);
+      else
+        $array2[strtolower($key)] = strtolower($value);
+    }
+    $array = $array2;
+  }
+  else {
+    foreach($array as $key => $value) {
+      if(is_array($value))
+        $array[$key] = $this->arraytolower($value, $include_leys);
+      else
+        $array[$key] = strtolower($value);  
+    }
+  }
+ 
+  return $array;
+}
 }

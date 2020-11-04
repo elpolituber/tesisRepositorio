@@ -8,4 +8,8 @@ class Observation extends Model
 {
     // ads
     protected $connection = 'pgsql-community';
+
+    protected $casts=[
+        'detals'=>'array',
+    ];
 }

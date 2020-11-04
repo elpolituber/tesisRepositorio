@@ -13,8 +13,10 @@ class CreateObservationTable extends Migration
      */
     public function up()
     {
-        Schema::create('observation', function (Blueprint $table) {
+        Schema::connection('pgsql-community')->create('observation', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('project_id')->constrained();
+            $table->json('detals');
             $table->timestamps();
         });
     }
