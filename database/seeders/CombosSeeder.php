@@ -368,7 +368,37 @@ class CombosSeeder extends Seeder
                 'type' => 'career_modality',
                 'state_id' => 1,
             ]);
-
+            //Cargos vinculacion
+            Catalogue::factory()->create([
+                'code' => '1',
+                'name' => 'rector',
+                'type' => 'cargo_vincualcion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '2',
+                'name' => 'vicerector',
+                'type' => 'cargo_vincualcion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '3',
+                'name' => 'coordinador de vinculacion',
+                'type' => 'cargo_vincualcion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '4',
+                'name' => 'coordinador de carrera',
+                'type' => 'cargo_vincualcion',
+                'state_id' => 1,
+            ]);
+            Catalogue::factory()->create([
+                'code' => '5',
+                'name' => 'representante legal del cenit',
+                'type' => 'cargo_vincualcion',
+                'state_id' => 1,
+            ]);
             //Career
             $modalidad=Catalogue::where( "name", "DUAL")->first();
             DB::connection('pgsql-ignug')->table('careers')->insert([

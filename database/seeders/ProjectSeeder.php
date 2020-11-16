@@ -54,6 +54,7 @@ class ProjectSeeder extends Seeder
             'situational_analysis'=>'AASDSDDSAAFDSSAF',//ANALISIS SITUACIONAL (DIAGNOSTICO)
             'foundamentation'=>'SADADASD',
             'justification'=>"ADSSDFDSF",
+            'coordinador_project_id'=>1,
             //'bibliografia'=>"SE PONE LA BIBLIOGRAFIA",
             ]);
             //Objetivo general
@@ -190,21 +191,21 @@ class ProjectSeeder extends Seeder
                 'state_id'=>1,
                 'project_id'=>1,
                 'type_id'=>5,//un catalogo unico de la tabla
-                'detail'=>null    
+                'detail'=>"esto es una prueba"    
             ]);
-     /*        DB::connection('pgsql-vinculacion')->table('student_participants')->insert([
+            DB::connection('pgsql-community')->table('student_participants')->insert([
                 'state_id'=>1,
                 'student_id'=>1,
                 'project_id'=>1,
                 'funtion_id'=>1,
             ]);
-            DB::connection('pgsql-vinculacion')->table('teacher_participants')->insert([
+            DB::connection('pgsql-community')->table('teacher_participants')->insert([
                 'state_id'=>1,
                 'teacher_id'=>1,
                 'project_id'=>1,
                 'workHours'=>1000,//horas de trabajo
                 'funtion_id'=>1,//rol asignado catalogo
-            ]); */
+            ]); 
 
     /* 
     {

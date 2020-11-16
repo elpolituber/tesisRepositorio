@@ -44,8 +44,8 @@ class CreateProjectsTable extends Migration
             $table->foreignId('rector_id')->nullable()->constrained('community.authorities');//rector
             $table->foreignId('coordinador_id')->nullable()->constrained('community.authorities');//coodinador de carrera
             $table->foreignId('coordinador_vinculacion_id')->nullable()->constrained('community.authorities');//coodinador de carrera vinculacion
+            $table->foreignId('coordinador_project_id')->constrained('authentication.users');// el coordinador solo de este projecto
             $table->json('bibliografia')->nullable();//pendiente
-            //$table->string('schedules')->constrained('ignug.files');//cronograma
 
             $table->timestamps();
         });

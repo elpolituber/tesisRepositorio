@@ -4,6 +4,8 @@ namespace App\Models\Community;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Ignug\Catalogue;
+use App\Models\Authentication\User;
+use App\Models\Community\Authorities;
 //use OwenIt\Auditing\Contracts\Auditable;
 
 class Project extends Model
@@ -29,4 +31,17 @@ class Project extends Model
     public function fraquency(){
         return $this->belongsTo(Catalogue::class,'fraquency_id');
     }
+    public function coordinador_project(){
+        return $this->belongsTo(User::class,'coordinador_project_id');
+    }
+    public function coordinador_vinculacion(){
+        return $this->belongsTo(Authorities::class,'coordinador_vinculacion_id');
+    }
+    public function coordinador(){
+        return $this->belongsTo(Authorities::class,'coordinador_id');
+    }
+    public function rector(){
+        return $this->belongsTo(Authorities::class,'rector_id');
+    }
+    
 }

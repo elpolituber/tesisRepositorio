@@ -22,7 +22,7 @@ class CreateAuthoritiesTable extends Migration
             $table->string('code', 100);
             $table->string('name', 500);
             $table->date('start_date');
-            $table->date('end_date');
+            $table->date('end_date')->nullable();
             $table->foreignId('state_id')->constrained();
             $table->timestamps();
         });

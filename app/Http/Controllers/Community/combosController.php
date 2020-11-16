@@ -26,7 +26,7 @@ class combosController extends Controller
     $aims=Catalogue::where('type','aims')->get(["name","id"]);
     $funtionTeacher=Catalogue::where('type','funtion_vinculacion')->get(["name","id"]);
     $status=Catalogue::where('type','status_vinculacion')->get(["name","id"]);
-    
+    $cargo=Catalogue::where('type','cargo_vincualcion')->get(["name","id"]);
     $combos=array(
         //"academiPreriod"=>$academiPreriod,
         "career"=> $this->arraytolower($career),
@@ -40,6 +40,7 @@ class combosController extends Controller
         "aims"=>$aims,
         "teacher_funtion"=>$funtionTeacher,
         "status"=>$status,
+        "cargo"=>$cargo,
       );
     return $combos;
  }
