@@ -11,33 +11,24 @@ use App\Models\Ignug\Catalogue;
 
 
 class combosController extends Controller
-{
+{//objeto se fue
   public function show(){
-   // $academiPreriod=AcademiPeriod::all("nombre","id");//esta tabla por el momento va hacer creada por el ignug 
-    $career=Career::join('catalogues','careers.modality_id','=','catalogues.id')
-    ->get(["careers.name","careers.id","catalogues.name as modality"]);
-    $mode=Catalogue::where('type','career_modality')->get(["name","id"]);
-    $meansOfVerification=Catalogue::where('type','means_verification')->get(["name","id"]);
-    $fraquencyOfActivity=Catalogue::where('type','fraquency_activity')->get(["name","id"]);
-    $assignedLine=Catalogue::where('type','assigned_line')->get(["name","id"]);
-    $linkageAxes=Catalogue::where('type','linkage_axes')->get(["name",'id']);//ejes de vinculacion
-    $bondingActivities=Catalogue::where('type','bonding_activities')->get(["name","id"]);//Actividad de vinculación
-    $researchAreas=Catalogue::where('type','research_areas')->get(["name","id"]);//rea de investigacion
-    $aims=Catalogue::where('type','aims')->get(["name","id"]);
-    $funtionTeacher=Catalogue::where('type','funtion_vinculacion')->get(["name","id"]);
-    $status=Catalogue::where('type','status_vinculacion')->get(["name","id"]);
-    $cargo=Catalogue::where('type','cargo_vincualcion')->get(["name","id"]);
+    $fraquencyOfActivity=Catalogue::where('type','fraquency_activity_vinculacion')->get(["name","id","type"]);
+    $assignedLine=Catalogue::where('type','assigned_line_vinculacion')->get(["name","id","type"]);
+    $linkageAxes=Catalogue::where('type','linkage_axes_vinculacion')->get(["name",'id',"type"]);//ejes de vinculacion
+    $bondingActivities=Catalogue::where('type','bonding_activities_vinculacion')->get(["name","id","type"]);//Actividad de vinculación
+    $researchAreas=Catalogue::where('type','research_areas_vinculacion')->get(["name","id","type"]);//rea de investigacion
+    $aims=Catalogue::where('type','aims_types_vinculacion')->get(["name","id","type"]);
+    $funtionTeacher=Catalogue::where('type','funtion_vinculacion')->get(["name","id","type"]);
+    $status=Catalogue::where('type','status_vinculacion')->get(["name","id","type"]);
+    $cargo=Catalogue::where('type','cargo_vincualcion')->get(["name","id","type"]);
     $combos=array(
-        //"academiPreriod"=>$academiPreriod,
-        "career"=> $this->arraytolower($career),
-        "mode"=>$this->arraytolower($mode),
-        "meansOfVerification"=>$meansOfVerification,
         "assignedLine"=>$assignedLine,
         "linkageAxes"=>$linkageAxes,
         "bondingActivities"=>$bondingActivities,
         "fraquencyOfActivity"=>$fraquencyOfActivity,
         "research_areas"=>$researchAreas,
-        "aims"=>$aims,
+        "objective"=>$aims,
         "teacher_funtion"=>$funtionTeacher,
         "status"=>$status,
         "cargo"=>$cargo,
@@ -45,38 +36,45 @@ class combosController extends Controller
     return $combos;
  }
  public function create(Request $request){
-    $value=Catalogue::where('type',$request->type.'_vinculacion')->count();
-    $type=$request->type."_vinculacion";
+    $value=$this->indice($request->type);
     $catalogue= new Catalogue;
-    $catalogue->code =$value+1;
+    $catalogue->code =$value;
     $catalogue->name = $request->name;
-    $catalogue->type = $type;//revisar
+    $catalogue->type = $request->type;//revisar
     $catalogue->state_id=1 ;
     $catalogue->save();
-    return Catalogue::where('type',$request->type.'_vinculacion')->get();
+    return "se han completado su peticion";
  }
  
-
- public function arraytolower($array, $include_leys=false) {
-  
-  if($include_leys) {
-    foreach($array as $key => $value) {
-      if(is_array($value))
-        $array2[strtolower($key)] = $this->arraytolower($value, $include_leys);
-      else
-        $array2[strtolower($key)] = strtolower($value);
-    }
-    $array = $array2;
+public function indice($type){
+  $value=Catalogue::where('type',$type)->count();
+  if($type == 'status_vinculacion'){
+    return 'status_'.$value+1;
   }
-  else {
-    foreach($array as $key => $value) {
-      if(is_array($value))
-        $array[$key] = $this->arraytolower($value, $include_leys);
-      else
-        $array[$key] = strtolower($value);  
-    }
+  if($type =='fraquency_activity_vinculacion'){
+    return 'fraquency_activity_'.$value+1;
   }
- 
-  return $array;
+  if($type =='assigned_line_vinculacion'){
+    return 'assigned_line_'.$value+1;
+  }
+  if($type =='linkage_axes_vinculacion'){
+    return 'linkage_axes_'.$value+1;
+  }
+  if($type =='aims_types_vinculacion'){
+    return 'aims_types_'.$value+1;
+  }
+  if($type =='bonding_activities_vinculacion'){
+    return 'bonding_activities_'.$value+1;
+  }
+  if($type =='research_areas_vinculacion'){
+    return 'research_areas_'.$value+1;
+  }
+  if($type =='cargo_vincualcion'){
+    return 'research_areas_'.$value+1;
+  }
+  if($type =='funtion_vinculacion'){
+    return 'funtion_'.$value+1;
+  }
 }
+ 
 }

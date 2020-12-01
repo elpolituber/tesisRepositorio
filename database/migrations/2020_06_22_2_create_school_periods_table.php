@@ -15,8 +15,8 @@ class CreateSchoolPeriodsTable extends Migration
     {
         Schema::connection('pgsql-ignug')->create('school_periods', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->string('name')->unique();
+            $table->string('code', 100)->unique();
+            $table->string('name', 500)->unique();
             $table->date('start_date');
             $table->date('end_date');
             $table->date('ordinary_start_date');

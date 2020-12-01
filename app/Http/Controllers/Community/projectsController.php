@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Community;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Community\Project;
-use App\Models\Community\CharitableInstitution;
-use App\Models\Community\SpecificAim;
-use App\Models\Community\ProjectActivities;
-use App\Models\Community\StudentParticipant;
-use App\Models\Community\TeacherParticipant;
-use App\Models\Community\Observation;
+use App\Models\Community\BeneficiaryInstitution;
+use App\Models\Community\Objetive;
+use App\Models\Community\Activities;
+use App\Models\Community\Participant;
 use App\Models\Ignug\Career;
+use App\Models\Authentication\Role;
 use App\Models\Ignug\Catalogue;
 use App\Models\Ignug\Image;
+use App\Models\Ignug\State;
 use Illuminate\Support\Facades\DB;
 
 class projectsController extends Controller
@@ -21,96 +21,50 @@ class projectsController extends Controller
   public function show(Request $request){
     $project_env=array();
     //coodinador de vinculacion
-    if($request->rol=="coodinador_vinculacion"){
-      $project_last=Project::select('id')->get();
-      for ($i=0; $i < $project_last->count() ; $i++) { 
-        $project=Project::find($project_last[$i])->first();
-        $assigned_line=Project::find($project->id)->assigned_line;
-        $fraquencyOfActivity=Project::find($project->id)->fraquency;
-        $status=Project::find($project->id)->status;
-        $coordinador_project=Project::find($project->id)->coordinador_project;
-        $coordinador_project=Project::findOrFail($project->id)->coordinador_project;
-        $coordinador_vinculacion=Project::findOrFail($project->id)->coordinador_vinculacion;
-        $coordinador=Project::findOrFail($project->id)->coordinador_id;
-        $rector=Project::findOrFail($project->id)->rector_id;
-        $project["assigned_line_id"]=$assigned_line->name;
-        $project["fraquency_id"]=$fraquencyOfActivity->name;
-        $project["status_id"]=$status->name;
-        $project["coordinador_project_id"]=$coordinador_project;
-        $project["coordinador_vinculacion_id"]=$coordinador_vinculacion;
-        $project["coordinador_id"]=$coordinador;
-        $project["rector_id"]=$rector;    
-        $project["charitable_institution_id"]=Project::find($project->id)->CharitableInstitution;
-        $project["career_id"]=Career::where('careers.id',$project->career_id)
-        ->join('catalogues','careers.modality_id','=','catalogues.id')
-        ->first(["careers.id","careers.name","catalogues.name as modality"]);
-        $project_env[]=$project;
-      }
-      return $project_env;
-    }
-    //Profesores
-    if($request->rol=="Teacher"){
-      $project_last=Project::where("coordinador_project_id",$request->user_id)->get(["id"]);
-      for ($i=0; $i < $project_last->count() ; $i++) { 
-        $project=Project::find($project_last[$i])->first();
-        $assigned_line=Project::find($project->id)->assigned_line;
-        $project["assigned_line_id"]=$assigned_line->name;
-        $fraquencyOfActivity=Project::find($project->id)->fraquency;
-        $status=Project::find($project->id)->status;
-        $coordinador_project=Project::find($project->id)->coordinador_project;
-        $coordinador_project=Project::findOrFail($project->id)->coordinador_project;
-        $coordinador_vinculacion=Project::findOrFail($project->id)->coordinador_vinculacion;
-        $coordinador=Project::findOrFail($project->id)->coordinador_id;
-        $rector=Project::findOrFail($project->id)->rector_id;
-        $project["fraquency_id"]=$fraquencyOfActivity->name;
-        $project["status_id"]=$status->name;
-        $project["coordinador_project_id"]=$coordinador_project; 
-        $project["coordinador_vinculacion_id"]=$coordinador_vinculacion;
-        $project["coordinador_id"]=$coordinador;
-        $project["rector_id"]=$rector;
-        $project["charitable_institution_id"]=Project::find($project->id)->CharitableInstitution;
-        $project["career_id"]=Career::where('careers.id',$project->career_id)
-        ->join('catalogues','careers.modality_id','=','catalogues.id')
-        ->first(["careers.id","careers.name","catalogues.name as modality"]);
-        $project_env[]=$project;
-      }
-      return $project_env;
-    }
-    //Coordinadores de otras carreras
-    if($request->rol=="codinadoor_de otra cosa"){
-      $project_last=Project::where("career_id",1)->get(["id"]);
-      for ($i=0; $i < $project_last->count() ; $i++) { 
-        $project=Project::find($project_last[$i])->first();
-        $assigned_line=Project::find($project->id)->assigned_line;
-        $fraquencyOfActivity=Project::find($project->id)->fraquency;
-        $status=Project::find($project->id)->status;
-        $coordinador_project=Project::find($project->id)->coordinador_project;
-        $coordinador_project=Project::findOrFail($project->id)->coordinador_project;
-        $coordinador_vinculacion=Project::findOrFail($project->id)->coordinador_vinculacion;
-        $coordinador=Project::findOrFail($project->id)->coordinador_id;
-        $rector=Project::findOrFail($project->id)->rector_id;
-        //sobrescribir en las fk
-        $project["assigned_line_id"]=$assigned_line->name;
-        $project["fraquency_id"]=$fraquencyOfActivity->name;
-        $project["status_id"]=$status->name;
-        $project["coordinador_project_id"]=$coordinador_project;
-        $project["coordinador_vinculacion_id"]=$coordinador_vinculacion;
-        $project["coordinador_id"]=$coordinador;
-        $project["rector_id"]=$rector;    
-        $project["charitable_institution_id"]=Project::find($project->id)->CharitableInstitution;
-        $project["career_id"]=Career::where('careers.id',$project->career_id)
-        ->join('catalogues','careers.modality_id','=','catalogues.id')
-        ->first(["careers.id","careers.name","catalogues.name as modality"]);
-        $project_env[]=$project;
-      }
-      return $project_env;
-    }
+    $projects=Project::with(['frequency_activities'=>function($frequency_activity){
+      $frequency_activity->with('state');
+    }])
+      //->with(['school_period'=>function($school){$school->with('state');}])
+      ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
+        $BeneficiaryInstitution->with('state');
+        //->with(['address'=>function($address){$address->with('state');}]);
+      }])
+      ->with(['status'=>function($status){
+        $status->with('state');
+      }])
+      ->with(['career'=>function($career){
+        $career->with('state')
+          ->with(['modality'=>function($modality){$modality->with('state');}]);
+      }])
+      ->with('state')
+      ->with(['location'=>function($location){
+        $location->with('state');
+      }])
+      ->with(['participant'=>function($participants){
+         $participants->with('state')
+         ->with(['user'=>function($user){$user->with('state');}])
+         ->with(['type'=>function($type){$type->with('state');}])
+         ->with(['function'=>function($function){$function->with('state');}]);
+      }])
+      ->with(['activities'=>function($activity){
+        $activity->with('state')
+        ->with(['type'=>function($type){$type->with('state');}]);
+      }])
+      ->with(['stake_holder'=>function($function){
+        $function->with('state')
+        ->with('type');
+      }])
+      ->where('state_id',State::where('code','1')->first()->id)
+       ->get();
+    
+    return $projects;
+    
  }
 
  public function create(Request $request){
   
   //CharatableInstitution
-   $CharitableInstitution= new CharitableInstitution; 
+   $CharitableInstitution= new BeneficiaryInstitution; 
 
    $CharitableInstitution->state_id=1;
    $CharitableInstitution->ruc=  $request->ruc;
@@ -124,7 +78,7 @@ class projectsController extends Controller
    $CharitableInstitution->direct_beneficiaries=$request->direct_beneficiaries;
    $CharitableInstitution->save();
    //fk Search
-   $fkCharitableInstitution=CharitableInstitution::where('ruc', $request->ruc)->first();
+   $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->ruc)->first();
    //project    
    $Project=new Project;
    $Project->charitable_institution_id=$fkCharitableInstitution->id;                 
@@ -165,7 +119,7 @@ class projectsController extends Controller
    //SpecificAim
    
    for($con=0;$con<count($request->type_id_specific);$con++){
-    $fkaims=$request->parent_code_id[$con] <> null ? SpecificAim::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
+    $fkaims=$request->parent_code_id[$con] <> null ? Objetive::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
     $this->aimsCreate(
       $fkProject->id,
       $request->type_id_specific[$con],
@@ -196,7 +150,7 @@ class projectsController extends Controller
 
 
   public function aimsCreate($id_project,$type_id,$description,$indicator,array $verifications,$parent_code_id){
-    $SpecificAim = new SpecificAim;
+    $SpecificAim = new Objetive;
     $SpecificAim->state_id=1;
     $SpecificAim->project_id=$id_project;
     $SpecificAim->indicator=$indicator;
@@ -207,7 +161,7 @@ class projectsController extends Controller
     $SpecificAim->save();
   }
   public function projectActivitiesCreate($id_project,$type_id,$detail){
-    $ProjectActivities= new ProjectActivities;
+    $ProjectActivities= new Activities;
     $ProjectActivities->state_id=1;
     $ProjectActivities->project_id=$id_project;
     $ProjectActivities->type_id=$type_id;
@@ -216,7 +170,7 @@ class projectsController extends Controller
   }
 
   public function studentParticipantCreate($id_project,$id_student,$funtionStudent){
-    $Student= new StudentParticipant;
+    $Student= new Participant;
     $Student->state_id=1;
     $Student->student_id=$id_student;
     $Student->project_id=$id_project;
@@ -234,16 +188,13 @@ class projectsController extends Controller
   }
 
   public function destroy($id){
-    if(!!ProjectActivities::where('project_id',$id)->get()){
+    if(!!Activities::where('project_id',$id)->get()){
       DB::connection('pgsql-community')->table('project_activities')->where('project_id', $id)->delete();
     } 
-    if(!!StudentParticipant::where('project_id',$id)->get()){ 
+    if(!!Participant::where('project_id',$id)->get()){ 
       DB::connection('pgsql-community')->table('student_participants')->where('project_id', $id)->delete();
     }  
-    if(!!TeacherParticipant::where('project_id',$id)->get()){
-      DB::connection('pgsql-community')->table('teacher_participants')->where('project_id', $id)->delete();
-    }
-    if(!!SpecificAim::where('project_id',$id)->get()){
+    if(!!Objetive::where('project_id',$id)->get()){
       DB::connection('pgsql-community')->table('specific_aims')->where('project_id', $id)->delete();
     }
     /* if(!!Observation::where('project_id',$id)->get()){ 
@@ -257,78 +208,50 @@ class projectsController extends Controller
       return "proyecto eliminado";
   }
   public function edit($id){
-    
-    $project=Project::where("id",$id)->first();
-    $assigned_line=Project::find($id)->assigned_line;
-    $fraquencyOfActivity=Project::find($id)->fraquency;
-    $status=Project::find($id)->status;
-    $coordinador_project=Project::findOrFail($id)->coordinador_project;
-    $coordinador_vinculacion=Project::findOrFail($id)->coordinador_vinculacion;
-    $coordinador=Project::findOrFail($id)->coordinador_id;
-    $rector=Project::findOrFail($id)->rector_id;
-   //sustitucion de datos Carrera modelo fk belongto Catalogue
-    $project["career_id"]=Career::where('careers.id',$project->career_id)
-    ->join('catalogues','careers.modality_id','=','catalogues.id')
-    ->first(["careers.id","careers.name","catalogues.name as modality"]);
-    $project["assigned_line_id"]=$assigned_line->name;
-    $project["fraquency_id"]=$fraquencyOfActivity->name;
-    $project["status_id"]=$status->name;
-    $project["coordinador_project_id"]=$coordinador_project;
-    $project["coordinador_vinculacion_id"]=$coordinador_vinculacion;
-    $project["coordinador_id"]=$coordinador;
-    $project["rector_id"]=$rector;
-    $project["charitable_institution_id"]=Project::find($id)->CharitableInstitution; //CharitableInstitution::where("id",$project->charitable_institution_id)->first();
-   //nuevos datos de otras tablas 
-   //array de carga 
-    $projectActivities_env=array();
-    $studentParticipant_env=array();
-    $teacherParticipant_env=array();
-    $specificAim_env=array();
-    //recorridos y cargas de los ARRAYS 
-    $studentParticipantv=StudentParticipant::where("project_id",$id)->get(["id"]);
-    for ($i=0; $i < $studentParticipantv->count(); $i++) { 
-      $studentParticipant=StudentParticipant::find($studentParticipantv[$i])->first();
-      $studentParticipant["student_id"]=StudentParticipant::find($studentParticipant->id)->student;
-      $studentParticipant["funtion_id"]=StudentParticipant::find($studentParticipant->id)->funtion;
-      $studentParticipant_env[]=$studentParticipant;
-    }
-    $teacherParticipantv=TeacherParticipant::where("project_id",$id)->get(['id']);
-    for ($i=0; $i < $teacherParticipantv->count(); $i++) { 
-      $teacherParticipant=TeacherParticipant::find($teacherParticipantv[$i])->first();
-      $teacherParticipant["teacher_id"]=TeacherParticipant::find($teacherParticipant->id)->teacher;
-      $teacherParticipant["funtion_id"]=TeacherParticipant::find($teacherParticipant->id)->funtion;
-      $teacherParticipant_env[]=$teacherParticipant;
-    }
-    $specificAimv=SpecificAim::where("project_id",$id)->get(['id']);
-    for ($i=0; $i < $specificAimv->count(); $i++) { 
-      $specificAim=SpecificAim::find($specificAimv[$i])->first();
-      $specificAim["type_id"]=SpecificAim::find($specificAim->id)->type;
-      $specificAim_env[]=$specificAim;
-    }
-    $projectActivity=ProjectActivities::where("project_id",$id)->get(['id']); 
-    for ($i=0; $i < $projectActivity->count(); $i++) { 
-      $projectActivities=ProjectActivities::find($projectActivity[$i])->first();
-      $projectActivities["type_id"]=ProjectActivities::find($projectActivities->id)->type;
-      $projectActivities_env[]=$projectActivities;
-    }
-    $observation=!!Observation::where('project_id',$id)->get() ? Observation::where('project_id',$id)->get():[];
-    $pdf= array(
-      'project'=>$project,
-      'studentParticipant'=>$studentParticipant_env,
-      'teacherParticipant'=>$teacherParticipant_env,
-      'specificAim'=>$specificAim_env,
-      'projectActivities'=>$projectActivities_env,
-      'observation'=>$observation,
 
-    );
+    $projects=Project::with(['frequency_activities'=>function($frequency_activity){
+      $frequency_activity->with('state');
+    }])
+      //->with(['school_period'=>function($school){$school->with('state');}])
+      ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
+        $BeneficiaryInstitution->with('state');
+        //->with(['address'=>function($address){$address->with('state');}]);
+      }])
+      ->with(['status'=>function($status){
+        $status->with('state');
+      }])
+      ->with(['career'=>function($career){
+        $career->with('state')
+          ->with(['modality'=>function($modality){$modality->with('state');}]);
+      }])
+      ->with('state')
+      ->with(['location'=>function($location){
+        $location->with('state');
+      }])
+      ->with(['participant'=>function($participants){
+         $participants->with('state')
+         ->with(['user'=>function($user){$user->with('state');}])
+         ->with(['type'=>function($type){$type->with('state');}])
+         ->with(['function'=>function($function){$function->with('state');}]);
+      }])
+      ->with(['activities'=>function($activity){
+        $activity->with('state')
+        ->with(['type'=>function($type){$type->with('state');}]);
+      }])
+      ->with(['stake_holder'=>function($function){
+        $function->with('state')
+        ->with('type');
+      }])
+      ->where('state_id',State::where('code','1')->first()->id)
+      ->where('id',$id)
+      ->get();
     
-    
-    return $pdf;
+    return $projects;
     
    }
 
   public function creador(Request $request){
-    $vista=Project::select('status_id')->get();
+    $vista=Role::all();
     return $vista;
   }
 

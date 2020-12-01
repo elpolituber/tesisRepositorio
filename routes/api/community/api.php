@@ -24,6 +24,7 @@ Route::get('/creator', [projectsController::class, 'creador']);
 
 //post
 Route::post('/project', [projectsController::class, 'create']);
+Route::post('/projectV', [projectsController::class, 'show']);
 Route::post('/combo', [combosController::class, 'create']);
 Route::post('/observation', [observationController::class, 'create']);
 
