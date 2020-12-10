@@ -2,14 +2,17 @@
 
 namespace App\Models\Ignug;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Career extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
+    use HasFactory;
 
     protected $connection = 'pgsql-ignug';
+
     protected $fillable = [
         'code',
         'name',
@@ -19,11 +22,6 @@ class Career extends Model implements Auditable
         'acronym',
     ];
 
-    public function teachers()
-    {
-        return $this->morphedByMany(Teacher::class, 'careerable');
-    }
-
     public function institution()
     {
         return $this->belongsTo(Institution::class);
@@ -31,12 +29,12 @@ class Career extends Model implements Auditable
 
     public function modality()
     {
-        return $this->belongsTo(Catalogue::class);
+        return $this->belongsTo(Catalogue::class, 'modality_id');
     }
 
     public function type()
     {
-        return $this->belongsTo(Catalogue::class);
+        return $this->belongsTo(Catalogue::class, 'type_id');
     }
 
     public function state()

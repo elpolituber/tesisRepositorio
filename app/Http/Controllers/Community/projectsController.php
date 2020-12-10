@@ -9,39 +9,38 @@ use App\Models\Community\BeneficiaryInstitution;
 use App\Models\Community\Objetive;
 use App\Models\Community\Activities;
 use App\Models\Community\Participant;
-use App\Models\Ignug\Career;
-use App\Models\Authentication\Role;
-use App\Models\Ignug\Catalogue;
 use App\Models\Ignug\Image;
-use App\Models\Ignug\State;
-use Illuminate\Support\Facades\DB;
+use App\Models\Community\StakeHolder;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Authentication\Role;
+
 
 class projectsController extends Controller
 {
+
   public function show(Request $request){
     $project_env=array();
     //coodinador de vinculacion
-    $projects=Project::with(['frequency_activities'=>function($frequency_activity){
-      $frequency_activity->with('state');
-    }])
-      //->with(['school_period'=>function($school){$school->with('state');}])
+    $projects=Project::with(['frequency_activities'=>function($frequency_activity){$frequency_activity;}])
+      ->with(['school_period'=>function($school){$school;}])
       ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
-        $BeneficiaryInstitution->with('state');
-        //->with(['address'=>function($address){$address->with('state');}]);
+        $BeneficiaryInstitution->with('state')
+        ->with(['address'=>function($address){
+          $address;}]);
       }])
       ->with(['status'=>function($status){
-        $status->with('state');
+       // $status->with('state');
       }])
       ->with(['career'=>function($career){
         $career->with('state')
           ->with(['modality'=>function($modality){$modality->with('state');}]);
       }])
-      ->with('state')
+      //->with('state')
       ->with(['location'=>function($location){
-        $location->with('state');
+    //    $location->with('state');
       }])
       ->with(['participant'=>function($participants){
-         $participants->with('state')
+         $participants//->with('state')
          ->with(['user'=>function($user){$user->with('state');}])
          ->with(['type'=>function($type){$type->with('state');}])
          ->with(['function'=>function($function){$function->with('state');}]);
@@ -54,7 +53,11 @@ class projectsController extends Controller
         $function->with('state')
         ->with('type');
       }])
-      ->where('state_id',State::where('code','1')->first()->id)
+      ->with(['objetive'=>function($objetive){
+        $objetive->with('children')
+          ->with('type');
+      }])->where($this->rol($request->role_id ,$request->career_id, $request->user_id))
+      
        ->get();
     
     return $projects;
@@ -62,174 +65,166 @@ class projectsController extends Controller
  }
 
  public function create(Request $request){
-  
+  //img 
+  $filePath = !!$request->beneficiary_institution["logo"] <> null?
+  $request->beneficiary_institution["logo"]->storeAs('charitable_institution',  $request->beneficiary_institution["name"]. '.png', 'public')
+  :null;  
   //CharatableInstitution
    $CharitableInstitution= new BeneficiaryInstitution; 
-
    $CharitableInstitution->state_id=1;
-   $CharitableInstitution->ruc=  $request->ruc;
-   $CharitableInstitution->name= $request->name_institution;
-   $CharitableInstitution->location_id= $request->location_id;
-   $CharitableInstitution->indirect_beneficiaries=$request->indirect_beneficiaries;
-   $CharitableInstitution->legal_representative_name=$request->legal_representative_name;
-   $CharitableInstitution->legal_representative_lastname=$request->legal_representative_lastname;
-   $CharitableInstitution->legal_representative_identification=$request->legal_representative_identification;
-   $CharitableInstitution->project_post_charge=$request->project_post_charge;
-   $CharitableInstitution->direct_beneficiaries=$request->direct_beneficiaries;
+   $CharitableInstitution->logo=$filePath;
+   $CharitableInstitution->ruc=$request["beneficiary_institution"]["ruc"];
+   $CharitableInstitution->name=$request->beneficiary_institution["name"];
+   $CharitableInstitution->address= $request->beneficiary_institution["address"];
+   $CharitableInstitution->legal_representative_name=$request->beneficiary_institution["legal_representative_name"];
+   $CharitableInstitution->legal_representative_lastname=$request->beneficiary_institution["legal_representative_lastname"];
+   $CharitableInstitution->legal_representative_identification=$request->beneficiary_institution["legal_representative_identification"];
+   $CharitableInstitution->function=$request->beneficiary_institution["function"];
    $CharitableInstitution->save();
    //fk Search
-   $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->ruc)->first();
+     $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->beneficiary_institution["ruc"])->first();
    //project    
-   $Project=new Project;
-   $Project->charitable_institution_id=$fkCharitableInstitution->id;                 
-  // $Project->academi_period_id=$fkacademiPreriod->id;
-   $Project->career_id=$request->career_id;
-   $Project->assigned_line_id=$request->assigned_line_id;
-   $Project->code=$request->code;
-   $Project->name=$request->project_name;
-   $Project->status_id= $request->status_id;
-   $Project->state_id=1;
-   $Project->field=$request->field;
-   $Project->aim=$request->aim;
-   $Project->fraquency_id=$request->fraquency_id;
-   $Project->cycle=$request->cycle;
-   $Project->location_id=$request->location_project; //localitation'
-   $Project->lead_time=$request->lead_time;
-   $Project->delivery_date=$request->delivery_date;// tiempo
-   $Project->start_date=$request->start_date;// tiempo
-   $Project->end_date=$request->end_date;//tienmpo
-   $Project->description=$request->description;
-   $Project->coordinator_name=$request->coordinator_name;
-   $Project->coordinator_lastname=$request->coordinator_lastname;
-   $Project->coordinator_postition=$request->coordinator_postition;
-   $Project->coordinator_funtion=$request->coordinator_funtion;
+    $Project=new Project;
+    $Project->beneficiary_institution=3;//$fkCharitableInstitution->id;                 
+  //  $Project->school_period=$request->school_period;
+    $Project->career_id=$request->career["id"];
+  //  //$Project->assigned_line_id=$request->assigned_line_id;
+    $Project->code=$request->code;
+    $Project->title=$request->title;
+    $Project->status_id= $request->status["id"];
+    $Project->state_id=1;
+    $Project->field=$request->field;//campo nulleable
+  // //  $Project->aim=$request->aim;//ojo no exixste pero proximo cambio
+    $Project->frequency_activities=$request->frequency_activities["id"];
+    $Project->cycle=$request->cycle;
+    $Project->location_id=$request->location["id"]; //localitation'
+    $Project->lead_time=$request->lead_time;
+    $Project->delivery_date=$request->delivery_date;// tiempo
+    $Project->start_date=$request->start_date;// tiempo
+    $Project->end_date=$request->end_date;//tienmpo
+    $Project->description=$request->description;
+   $Project->indirect_beneficiaries=$request->indirect_beneficiaries;
+   $Project->direct_beneficiaries=$request->direct_beneficiaries;
    $Project->introduction=$request->introduction;
    $Project->situational_analysis=$request->situational_analysis;
    $Project->foundamentation=$request->foundamentation;
-   $Project->rector_id=$request->rector_id;
-   $Project->coordinador_id=$request->coordinador_id;
-   $Project->coordinador_vinculacion_id=$request->coordinador_vinculacion_id;
-   $Project->coordinador_project_id=$request->coordinador_project_id;
    $Project->justification=$request->justification;
+   $Project->create_by=$request->create_by;
    $Project->bibliografia=$request->bibliografia;
+   $Project->observations=$request->observations;
    $Project->save();
-  
    //fk Project searh
    $fkProject=Project::where('code',$request->code)->first("id");
-   //SpecificAim
-   
-   for($con=0;$con<count($request->type_id_specific);$con++){
-    $fkaims=$request->parent_code_id[$con] <> null ? Objetive::where('description',$request->parent_code_id[$con])->first("id") : (object) array("id"=>null);
+   //Objective
+   for($con=0;$con<count($request->objetive);$con++){
+    $objective=$request->objetive[$con];
+    $fkaims=$objective["children"] <> null ?
+    Objetive::where('description',$objective["description"])->first("id")->id : 
+    (object) array("id"=>null);
     $this->aimsCreate(
       $fkProject->id,
-      $request->type_id_specific[$con],
-      $request->description_aims[$con],
-      $request->indicator[$con],
-      $request->verifications[$con],
-      $fkaims->id
+      $objective,
+      $fkaims
     );  
    }
   //ProjectActivities
-    for($con=0;$con<count($request->type_id_activities);$con++){
-    $this->projectActivitiesCreate($fkProject->id,$request->type_id_activities[$con],$request->detail_activities[$con]);
-   } 
-  //img 
-  /*$filePath = $request->logo->storeAs('charitable_institution',  $fkCharitableInstitution->name. '.png', 'public');
-  $images= new Image;
-  $images->code=$fkCharitableInstitution->ruc;
-  $images->name=$fkCharitableInstitution->name;
-  $images->description='Este es para el uso de los pdf de vinculacion';
-  $images->uri=$filePath;
-  $images->type=Image::AVATAR_TYPE;
-  $images->state_id=1;
-  $images->save(); */
-
-
+    for($con=0;$con<count($request->activities);$con++){
+    $activity=$request->activities[$con];
+    $this->projectActivitiesCreate(
+      $fkProject->id,
+      $activity
+    );
+   }
+   //Participant
+   for($con=0;$con<count($request->participant);$con++){
+      $participant=$request->participant[$con];
+      $this->participantCreate(
+        $fkProject->id,
+        $participant
+      );
+    } 
+    //stakeHolderCreate
+    for($con=0;$con<count($request->stake_holder);$con++){
+        $stakeHolder=$request->stake_holder[$con];
+        $this->stakeHolderCreate(
+          $fkProject->id,
+          $stakeHolder
+        );
+    }
    return true; 
   }
 
 
-  public function aimsCreate($id_project,$type_id,$description,$indicator,array $verifications,$parent_code_id){
+  public function aimsCreate($id_project,array $objective,$parent_code_id){
     $SpecificAim = new Objetive;
     $SpecificAim->state_id=1;
     $SpecificAim->project_id=$id_project;
-    $SpecificAim->indicator=$indicator;
-    $SpecificAim->verifications=$verifications;
-    $SpecificAim->description=$description;
-    $SpecificAim->type_id=$type_id;
-    $SpecificAim->parent_code_id=$parent_code_id;
+    $SpecificAim->indicator= $objective["indicator"];
+    $SpecificAim->means_verification=$objective["means_verification"];
+    $SpecificAim->description=$objective["description"];
+    $SpecificAim->type=$objective["type"]["id"];
+    $SpecificAim->children=$parent_code_id;
     $SpecificAim->save();
   }
-  public function projectActivitiesCreate($id_project,$type_id,$detail){
+  public function projectActivitiesCreate($id_project,array $activities){
     $ProjectActivities= new Activities;
     $ProjectActivities->state_id=1;
     $ProjectActivities->project_id=$id_project;
-    $ProjectActivities->type_id=$type_id;
-    $ProjectActivities->$detail;
+    $ProjectActivities->type_id=$activities["type"]["id"];
+    $ProjectActivities->description=$activities["description"];
     $ProjectActivities->save();
   }
 
-  public function studentParticipantCreate($id_project,$id_student,$funtionStudent){
-    $Student= new Participant;
-    $Student->state_id=1;
-    $Student->student_id=$id_student;
-    $Student->project_id=$id_project;
-    $Student->funtion_id=$funtionStudent;
-    $Student->save();
+  public function participantCreate($id_project,array $participants){
+    $participant= new Participant;
+    $participant->state_id=1;
+    $participant->user_id=$participants["user"]["id"];
+    $participant->project_id=$id_project;
+    $participant->type=$participants["type"]["id"];
+    $participant->position=$participants["position"];
+    $participant->working_hours=$participants["working_hours"];
+    $participant->function=$participants["function"]["id"];
+    $participant->save();
   }
-  public function teacherParticipantCreate($id_project,$teacher_id,$workHours,$funtionTeacher){
-    $Teacher=new TeacherParticipant;
-    $Teacher->state_id=1;
-    $Teacher->teacher_id=$id_project;
-    $Teacher->project_id=$teacher_id;
-    $Teacher->workHours=$workHours;
-    $Teacher->funtion_id=$funtionTeacher;
-    $Teacher->save();
+  public function stakeHolderCreate($id_project,array $stakeHolders){
+    $stakeHolder=new StakeHolder;
+    $stakeHolder->state_id=1;
+    $stakeHolder->project_id=$id_project;
+    $stakeHolder->name=$stakeHolders["name"];
+    $stakeHolder->lastname=$stakeHolders["lastname"];
+    $stakeHolder->identification=$stakeHolders["identification"];
+    $stakeHolder->position=$stakeHolders["position"];
+    $stakeHolder->type=$stakeHolders["type"]["id"];
+    $stakeHolder->function=$stakeHolders["function"]["id"];
+    $stakeHolder->save();
   }
 
   public function destroy($id){
-    if(!!Activities::where('project_id',$id)->get()){
-      DB::connection('pgsql-community')->table('project_activities')->where('project_id', $id)->delete();
-    } 
-    if(!!Participant::where('project_id',$id)->get()){ 
-      DB::connection('pgsql-community')->table('student_participants')->where('project_id', $id)->delete();
-    }  
-    if(!!Objetive::where('project_id',$id)->get()){
-      DB::connection('pgsql-community')->table('specific_aims')->where('project_id', $id)->delete();
-    }
-    /* if(!!Observation::where('project_id',$id)->get()){ 
-      DB::connection('pgsql-community')->table('observations')->where('project_id', $id)->delete();
-    } */
-    if(!!Project::find($id)->get()){
-      DB::connection('pgsql-community')->table('projects')->where('id', $id)->delete();
-    }else{
-      return "No existe el proyecto";
-    }
+    // cambiar de estado de 1 a 2
+    $Project=Project::find($id);
+    $Project->state_id=2;
       return "proyecto eliminado";
   }
   public function edit($id){
-
-    $projects=Project::with(['frequency_activities'=>function($frequency_activity){
-      $frequency_activity->with('state');
-    }])
-      //->with(['school_period'=>function($school){$school->with('state');}])
+    $projects=Project::with(['frequency_activities'=>function($frequency_activity){$frequency_activity;}])
+      ->with(['school_period'=>function($school){$school;}])
       ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
-        $BeneficiaryInstitution->with('state');
-        //->with(['address'=>function($address){$address->with('state');}]);
+        $BeneficiaryInstitution->with('state')
+        ->with(['address'=>function($address){$address;}]);
       }])
       ->with(['status'=>function($status){
-        $status->with('state');
+       // $status->with('state');
       }])
       ->with(['career'=>function($career){
         $career->with('state')
           ->with(['modality'=>function($modality){$modality->with('state');}]);
       }])
-      ->with('state')
+      //->with('state')
       ->with(['location'=>function($location){
-        $location->with('state');
+    //    $location->with('state');
       }])
       ->with(['participant'=>function($participants){
-         $participants->with('state')
+         $participants//->with('state')
          ->with(['user'=>function($user){$user->with('state');}])
          ->with(['type'=>function($type){$type->with('state');}])
          ->with(['function'=>function($function){$function->with('state');}]);
@@ -242,17 +237,85 @@ class projectsController extends Controller
         $function->with('state')
         ->with('type');
       }])
-      ->where('state_id',State::where('code','1')->first()->id)
+      ->with(['objetive'=>function($objetive){
+        $objetive->with('children')
+          ->with('type');
+      }])
       ->where('id',$id)
       ->get();
     
     return $projects;
     
    }
-
+   public function update(Request $request, $id){
+     
+   }
+  public function rol($rol=2, $career=1,$user=1){
+    $i=1;
+    $Rol=[
+      [],
+      ['code','CAREER_COORDINATOR'],
+      ['code','COMMUNITY_COORDINATOR'],
+      ['code','teacher'],
+    ];
+    $Condicion=[
+      [],
+      [//CAREER_COORDINATOR coodinador de carrera 0
+        ['career_id', $career],
+        ['projects.state_id',1]
+      ],
+      [//COMMUNITY_COORDINATOR coodrinador de vincyulacion 1
+        ['projects.state_id',1],
+        ['projects.state_id',1]
+      ],
+      [//TEACHER   
+        ['projects.state_id',1],
+        ['create_by',$user],
+      ]
+    ];
+    do{
+   $valor=!!Role::where($Rol[$i][0],$Rol[$i][1])->first('id') ?
+    Role::where($Rol[$i][0],$Rol[$i][1])->first('id'):
+    (object) array("id"=>0);
+      if($rol==$valor->id){
+        return $Condicion[2];
+      }
+      $i++;
+    }while($rol== $valor->id ||  $i<count($Rol));  
+    
+    
+  }
   public function creador(Request $request){
-    $vista=Role::all();
+    $vista=count($request->objetive);//Role::all();   
     return $vista;
   }
 
 }
+
+    /**
+     * $request->role_id 
+     * $request->user_id 
+     * $request->institution_id se necesita
+     * $request->career_id ADMINISTRADOR
+      *ESTUDIANTE
+      *PROFESOR
+      *RECTOR
+      *VICERRECTOR
+      *CONSERJE
+      *COORD. CARRERA
+      *COORD. ACADEMICO
+      *COORD. VINCULACION
+      *COORD. INVESTIGACION
+      *COORD. ADMINISTRATIVO
+      *ADMIN
+      *STUDENT
+      *TEACHER
+      *CHANCELLOR
+      *VICE_CHANCELLOR
+      *CONCIERGE
+      *CAREER_COORDINATOR
+      *ACADEMIC_COORDINATOR
+      *COMMUNITY_COORDINATOR
+      *INVESTIGATION_COORDINATOR
+      *ADMINISTRATIVE_COORDINATOR
+     */

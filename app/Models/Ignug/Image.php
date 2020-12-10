@@ -2,14 +2,15 @@
 
 namespace App\Models\Ignug;
 
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use Carbon\Carbon;
 
 class Image extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-
+    use HasFactory;
     protected $connection = 'pgsql-ignug';
 
     const AVATAR_TYPE = 'avatars';
@@ -21,6 +22,7 @@ class Image extends Model implements Auditable
         'description',
         'type',
         'uri',
+        'extension',
     ];
 
     public function imageable()
@@ -48,7 +50,7 @@ class Image extends Model implements Auditable
             ]);
 
             $avatar->imageable()->associate($model);
-            $avatar->state()->associate(State::where('code', '1')->first());
+            $avatar->state()->associate(State::firstWhere('code', State::ACTIVE));
             $avatar->save();
         }
 

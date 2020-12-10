@@ -2,10 +2,8 @@
 
 namespace App\Models\Ignug;
 
-use App\Models\Attendance\Workday;
-use App\Models\Authentication\User;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class State extends Model implements Auditable
@@ -14,28 +12,24 @@ class State extends Model implements Auditable
     use HasFactory;
 
     protected $connection = 'pgsql-ignug';
+
+    const ACTIVE = '1';
+    const DELETED = '0';
+
     public $timestamps = false;
 
     protected $fillable = [
         'name',
-    ];
-
-    protected $guarded = [
         'code',
     ];
 
-    public function institutions()
+    public function setCodeAttribute($value)
     {
-        return $this->hasMany(Institution::class);
+        $this->attributes['code'] = strtoupper($value);
     }
 
-    public function workdays()
+    public function setNameAttribute($value)
     {
-        return $this->hasMany(Workday::class);
-    }
-
-    public function users()
-    {
-        return $this->hasMany(User::class);
+        $this->attributes['name'] = strtoupper($value);
     }
 }

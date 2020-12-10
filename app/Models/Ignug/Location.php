@@ -2,6 +2,7 @@
 
 namespace App\Models\Ignug;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Models\Ignug\State;
@@ -9,7 +10,7 @@ use App\Models\Ignug\State;
 class Location extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-
+    use HasFactory;
     protected $connection = 'pgsql-job-board';
     protected $fillable = [
         'code',

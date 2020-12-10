@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Models\Ignug;
 
 use App\Models\Authentication\Role;

@@ -82,7 +82,6 @@ class DatabaseSeeder extends Seeder
                 'route_id' => $route1->id,
                 'role_id' => $role->id,
             ]);
-
             Permission::factory()->create([
                 'route_id' => $route2->id,
                 'role_id' => $role->id,
@@ -114,7 +113,6 @@ class DatabaseSeeder extends Seeder
             drop schema if exists web cascade;
             drop schema if exists teacher_eval cascade;
             drop schema if exists community cascade;
-
             create schema authentication;
             create schema attendance;
             create schema ignug;

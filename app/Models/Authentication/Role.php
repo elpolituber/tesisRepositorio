@@ -14,7 +14,7 @@ class Role extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     protected $connection = 'pgsql-authentication';
-
+    //rotected $table='pgsql.roles';
     const ADMINISTRATOR = 'admin';
     const TEACHER = 'teacher';
 

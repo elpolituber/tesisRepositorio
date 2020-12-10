@@ -2,33 +2,36 @@
 
 namespace App\Models\Ignug;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Authority extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-
+    use HasFactory;
     protected $connection = 'pgsql-ignug';
     protected $fillable = [
         'code',
         'name',
-        'date',
+        'start_date',
+        'end_date',
+        'functions',
     ];
-
-    public function career()
-    {
-        return $this->belongsTo(Career::class);
-    }
+    protected $casts = [
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
+        'functions' => 'array',
+    ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function type()
+    public function authorityType()
     {
-        return $this->belongsTo(Catalogue::class);
+        return $this->belongsTo(AuthorityType::class);
     }
 
     public function state()

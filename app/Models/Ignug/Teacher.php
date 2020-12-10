@@ -4,14 +4,17 @@ namespace App\Models\Ignug;
 
 use App\Models\Authentication\User;
 use App\Models\Attendance\Attendance;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
 
 class Teacher extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-
+    use HasFactory;
     protected $connection = 'pgsql-ignug';
+    protected $table = 'ignug.teachers';
+
     protected $fillable = [];
 
     public function user()
@@ -27,11 +30,6 @@ class Teacher extends Model implements Auditable
     public function state()
     {
         return $this->belongsTo(State::class);
-    }
-
-    public function careers()
-    {
-        return $this->morphToMany(Career::class, 'careerable');
     }
 
     public function images()

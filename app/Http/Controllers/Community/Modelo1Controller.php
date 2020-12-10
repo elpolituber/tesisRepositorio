@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Community;
 
 use App\Models\Cecy\Modelo1;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class Modelo1Controller extends Controller
 {
