@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Community;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Community\beneficiaryInstitutionController as institute;
+use App\Http\Controllers\Community\objetiveController as objetiveC;
+use App\Http\Controllers\Community\stakeHolderController as stake; 
+use App\Http\Controllers\Community\activityController as Activity;
+use App\Http\Controllers\Community\participantController as Participant;
 use Illuminate\Http\Request;
 use App\Models\Community\Project;
-use App\Models\Community\BeneficiaryInstitution;
 use App\Models\Community\Objetive;
-use App\Models\Community\Activities;
-use App\Models\Community\Participant;
-use App\Models\Ignug\Image;
-use App\Models\Community\StakeHolder;
-use Illuminate\Support\Facades\Storage;
 use App\Models\Authentication\Role;
 
 
@@ -65,51 +64,39 @@ class projectsController extends Controller
  }
 
  public function create(Request $request){
-  //img 
-  $filePath = !!$request->beneficiary_institution["logo"] <> null?
-  $request->beneficiary_institution["logo"]->storeAs('charitable_institution',  $request->beneficiary_institution["name"]. '.png', 'public')
-  :null;  
+ 
   //CharatableInstitution
-   $CharitableInstitution= new BeneficiaryInstitution; 
-   $CharitableInstitution->state_id=1;
-   $CharitableInstitution->logo=$filePath;
-   $CharitableInstitution->ruc=$request["beneficiary_institution"]["ruc"];
-   $CharitableInstitution->name=$request->beneficiary_institution["name"];
-   $CharitableInstitution->address= $request->beneficiary_institution["address"];
-   $CharitableInstitution->legal_representative_name=$request->beneficiary_institution["legal_representative_name"];
-   $CharitableInstitution->legal_representative_lastname=$request->beneficiary_institution["legal_representative_lastname"];
-   $CharitableInstitution->legal_representative_identification=$request->beneficiary_institution["legal_representative_identification"];
-   $CharitableInstitution->function=$request->beneficiary_institution["function"];
-   $CharitableInstitution->save();
+  $charitableInstitution = new institute;
+  $fkCharitableInstitution= $charitableInstitution->create($request->beneficiary_institution);
    //fk Search
-     $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->beneficiary_institution["ruc"])->first();
+  // $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->beneficiary_institution["ruc"])->first();
    //project    
-    $Project=new Project;
-    $Project->beneficiary_institution=$fkCharitableInstitution->id;                 
-  //  $Project->school_period=$request->school_period;
-    $Project->career_id=$request->career["id"];
+   $Project=new Project;
+   $Project->beneficiary_institution=$fkCharitableInstitution;                 
+   $Project->school_period=$request->school_period;
+   $Project->career_id=$request->career["id"];
   //  //$Project->assigned_line_id=$request->assigned_line_id;
-    $Project->code=$request->code;
-    $Project->title=$request->title;
-    $Project->status_id= $request->status["id"];
-    $Project->state_id=1;
-    $Project->field=$request->field;//campo nulleable
+   $Project->code=$request->code;
+   $Project->title=$request->title;
+   $Project->status_id= $request->status["id"];
+   $Project->state_id=1;
+   $Project->field=$request->field;//campo nulleable
   // //  $Project->aim=$request->aim;//ojo no exixste pero proximo cambio
-    $Project->frequency_activities=$request->frequency_activities["id"];
-    $Project->cycle=$request->cycle;
-    $Project->location_id=$request->location["id"]; //localitation'
-    $Project->lead_time=$request->lead_time;
-    $Project->delivery_date=$request->delivery_date;// tiempo
-    $Project->start_date=$request->start_date;// tiempo
-    $Project->end_date=$request->end_date;//tienmpo
-    $Project->description=$request->description;
+   $Project->frequency_activities=$request->frequency_activities["id"];
+   $Project->cycle=$request->cycle;
+   $Project->location_id=$request->location["id"]; //localitation'
+   $Project->lead_time=$request->lead_time;
+   $Project->delivery_date=$request->delivery_date;// tiempo
+   $Project->start_date=$request->start_date;// tiempo
+   $Project->end_date=$request->end_date;//tienmpo
+   $Project->description=$request->description;
    $Project->indirect_beneficiaries=$request->indirect_beneficiaries;
    $Project->direct_beneficiaries=$request->direct_beneficiaries;
    $Project->introduction=$request->introduction;
    $Project->situational_analysis=$request->situational_analysis;
    $Project->foundamentation=$request->foundamentation;
    $Project->justification=$request->justification;
-   $Project->create_by=$request->create_by;
+   $Project->create_by=$request->user_id;
    $Project->bibliografia=$request->bibliografia;
    $Project->observations=$request->observations;
    $Project->save();
@@ -121,7 +108,8 @@ class projectsController extends Controller
     $fkaims=$objective["children"] <> null ?
     Objetive::where('description',$objective["description"])->first("id")->id : 
     (object) array("id"=>null);
-    $this->aimsCreate(
+    $aims= new objetiveC;
+    $aims->aimsCreate(
       $fkProject->id,
       $objective,
       $fkaims
@@ -130,7 +118,8 @@ class projectsController extends Controller
   //ProjectActivities
     for($con=0;$con<count($request->activities);$con++){
     $activity=$request->activities[$con];
-    $this->projectActivitiesCreate(
+    $activities=new Activity;
+    $activities->projectActivitiesCreate(
       $fkProject->id,
       $activity
     );
@@ -138,7 +127,8 @@ class projectsController extends Controller
    //Participant
    for($con=0;$con<count($request->participant);$con++){
       $participant=$request->participant[$con];
-      $this->participantCreate(
+      $participants=new Participant;
+      $participants->participantCreate(
         $fkProject->id,
         $participant
       );
@@ -146,7 +136,8 @@ class projectsController extends Controller
     //stakeHolderCreate
     for($con=0;$con<count($request->stake_holder);$con++){
         $stakeHolder=$request->stake_holder[$con];
-        $this->stakeHolderCreate(
+        $stake= new stake;
+        $stake->stakeHolderCreate(
           $fkProject->id,
           $stakeHolder
         );
@@ -154,49 +145,84 @@ class projectsController extends Controller
    return true; 
   }
 
-
-  public function aimsCreate($id_project,array $objective,$parent_code_id){
-    $SpecificAim = new Objetive;
-    $SpecificAim->state_id=1;
-    $SpecificAim->project_id=$id_project;
-    $SpecificAim->indicator= $objective["indicator"];
-    $SpecificAim->means_verification=$objective["means_verification"];
-    $SpecificAim->description=$objective["description"];
-    $SpecificAim->type=$objective["type"]["id"];
-    $SpecificAim->children=$parent_code_id;
-    $SpecificAim->save();
-  }
-  public function projectActivitiesCreate($id_project,array $activities){
-    $ProjectActivities= new Activities;
-    $ProjectActivities->state_id=1;
-    $ProjectActivities->project_id=$id_project;
-    $ProjectActivities->type_id=$activities["type"]["id"];
-    $ProjectActivities->description=$activities["description"];
-    $ProjectActivities->save();
-  }
-
-  public function participantCreate($id_project,array $participants){
-    $participant= new Participant;
-    $participant->state_id=1;
-    $participant->user_id=$participants["user"]["id"];
-    $participant->project_id=$id_project;
-    $participant->type=$participants["type"]["id"];
-    $participant->position=$participants["position"];
-    $participant->working_hours=$participants["working_hours"];
-    $participant->function=$participants["function"]["id"];
-    $participant->save();
-  }
-  public function stakeHolderCreate($id_project,array $stakeHolders){
-    $stakeHolder=new StakeHolder;
-    $stakeHolder->state_id=1;
-    $stakeHolder->project_id=$id_project;
-    $stakeHolder->name=$stakeHolders["name"];
-    $stakeHolder->lastname=$stakeHolders["lastname"];
-    $stakeHolder->identification=$stakeHolders["identification"];
-    $stakeHolder->position=$stakeHolders["position"];
-    $stakeHolder->type=$stakeHolders["type"]["id"];
-    $stakeHolder->function=$stakeHolders["function"]["id"];
-    $stakeHolder->save();
+  public function update(Request $request, $id){
+    //CharatableInstitution
+    $charitableInstitution = new institute;
+    $fkCharitableInstitution= $charitableInstitution->update($request->beneficiary_institution);
+    //fk Search
+    //project    
+    $Project=Project::find($id);
+    $Project->beneficiary_institution=$fkCharitableInstitution;                 
+    $Project->school_period=$request->school_period;
+    $Project->career_id=$request->career["id"];
+      //$Project->assigned_line_id=$request->assigned_line_id;
+    $Project->code=$request->code;
+    $Project->title=$request->title;
+    $Project->status_id= $request->status["id"];
+    $Project->state_id=1;
+    $Project->field=$request->field;//campo nulleable
+    //  $Project->aim=$request->aim;//ojo no exixste pero proximo cambio
+    $Project->frequency_activities=$request->frequency_activities["id"];
+    $Project->cycle=$request->cycle;
+    $Project->location_id=$request->location["id"]; //localitation'
+    $Project->lead_time=$request->lead_time;
+    $Project->delivery_date=$request->delivery_date;// tiempo
+    $Project->start_date=$request->start_date;// tiempo
+    $Project->end_date=$request->end_date;//tienmpo
+    $Project->description=$request->description;
+    $Project->indirect_beneficiaries=$request->indirect_beneficiaries;
+    $Project->direct_beneficiaries=$request->direct_beneficiaries;
+    $Project->introduction=$request->introduction;
+    $Project->situational_analysis=$request->situational_analysis;
+    $Project->foundamentation=$request->foundamentation;
+    $Project->justification=$request->justification;
+    $Project->create_by=$request->user_id ;
+    $Project->bibliografia=$request->bibliografia;
+    $Project->observations=$request->observations;
+    $Project->save();
+    //fk Project searh
+    $fkProject=Project::where('code',$request->code)->first("id");
+    //Objective
+    for($con=0;$con<count($request->objetive);$con++){
+      $objective=$request->objetive[$con];
+      $fkaims=$objective["children"] <> null ?
+      Objetive::where('description',$objective["description"])->first("id")->id : 
+      (object) array("id"=>null);
+      $aims= new objetiveC;
+      $aims->aimsUpdate(
+        $fkProject->id,
+        $objective,
+        $fkaims
+      );  
+    }
+    //ProjectActivities
+      for($con=0;$con<count($request->activities);$con++){
+      $activity=$request->activities[$con];
+      $activities=new Activity;
+      $activities->projectActivitiesUpdate(
+        $fkProject->id,
+        $activity
+      );
+    }
+    //Participant
+    for($con=0;$con<count($request->participant);$con++){
+        $participant=$request->participant[$con];
+        $participants=new Participant;
+        $participants->participantUpdate(
+          $fkProject->id,
+          $participant
+        );
+      } 
+      //stakeHolder
+      for($con=0;$con<count($request->stake_holder);$con++){
+          $stakeHolder=$request->stake_holder[$con];
+          $stake= new stake;
+          $stake->stakeHolderUpdate(
+            $fkProject->id,
+            $stakeHolder
+          );
+      }
+   return true; 
   }
 
   public function destroy($id){
@@ -247,9 +273,7 @@ class projectsController extends Controller
     return $projects;
     
    }
-   public function update(Request $request, $id){
-     
-   }
+   
   public function rol($rol=2, $career=1,$user=1){
     $i=1;
     $Rol=[
