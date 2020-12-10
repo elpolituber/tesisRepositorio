@@ -85,7 +85,7 @@ class projectsController extends Controller
      $fkCharitableInstitution=BeneficiaryInstitution::where('ruc', $request->beneficiary_institution["ruc"])->first();
    //project    
     $Project=new Project;
-    $Project->beneficiary_institution=3;//$fkCharitableInstitution->id;                 
+    $Project->beneficiary_institution=$fkCharitableInstitution->id;                 
   //  $Project->school_period=$request->school_period;
     $Project->career_id=$request->career["id"];
   //  //$Project->assigned_line_id=$request->assigned_line_id;
