@@ -82,7 +82,7 @@ class stakeHolderController extends Controller
         $stakeHolder->identification=$stakeHolders["identification"];
         $stakeHolder->position=$stakeHolders["position"];
         $stakeHolder->type=$stakeHolders["type"]["id"];
-        $stakeHolder->function=$stakeHolders["function"]["id"];
+     //   $stakeHolder->function=$stakeHolders["function"]["id"];
         $stakeHolder->save();
     }
 

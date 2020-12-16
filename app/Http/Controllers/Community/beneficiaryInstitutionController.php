@@ -26,9 +26,9 @@ class beneficiaryInstitutionController extends Controller
         $CharitableInstitution->logo=$filePath;
         $CharitableInstitution->ruc=$beneficiary_institution["ruc"];
         $CharitableInstitution->name=$beneficiary_institution["name"];
-        $CharitableInstitution->address= $beneficiary_institution["address"];
+        $CharitableInstitution->address= $beneficiary_institution["address"];///aadress de la parroquia
         $CharitableInstitution->legal_representative_name=$beneficiary_institution["legal_representative_name"];
-        $CharitableInstitution->legal_representative_lastname=$beneficiary_institution["legal_representative_lastname"];
+        $CharitableInstitution->legal_representative_lastname=$beneficiary_institution["legal_representative_lastname"];//boorar state-holder 
         $CharitableInstitution->legal_representative_identification=$beneficiary_institution["legal_representative_identification"];
         $CharitableInstitution->function=$beneficiary_institution["function"];
         $CharitableInstitution->save();

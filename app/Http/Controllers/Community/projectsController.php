@@ -73,7 +73,7 @@ class projectsController extends Controller
    //project    
    $Project=new Project;
    $Project->beneficiary_institution=$fkCharitableInstitution;                 
-   $Project->school_period=$request->school_period;
+   $Project->school_period=$request->school_period["id"];
    $Project->career_id=$request->career["id"];
   //  //$Project->assigned_line_id=$request->assigned_line_id;
    $Project->code=$request->code;
