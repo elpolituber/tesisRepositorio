@@ -72,7 +72,7 @@ class activityController extends Controller
         $ProjectActivities->save();
     }
     public function projectActivitiesUpdate($id_project,array $activities){
-        $ProjectActivities= $activities["id"];
+        $ProjectActivities=Activities::find( $activities["id"]);
         $ProjectActivities->state_id=1;
         $ProjectActivities->project_id=$id_project;
         $ProjectActivities->type_id=$activities["type"]["id"];

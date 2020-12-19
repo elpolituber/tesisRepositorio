@@ -87,3 +87,15 @@ class objetiveController extends Controller
         $SpecificAim->save();
       }
 }
+
+/*  
+    obejetive:[
+        mv:asda 
+        i:documento   
+        d:desraoollar un sistemas erb quw de todo
+        t:2 //cata logo objE resultado obg actividad 
+        obj<-obs<-actividad o 
+        children: desraoollar un sistemas erb quw de todo
+        ]
+    ]
+*/

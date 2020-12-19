@@ -68,18 +68,18 @@ class participantController extends Controller
         $participant->user_id=$participants["user"]["id"];
         $participant->project_id=$id_project;
         $participant->type=$participants["type"]["id"];
-        $participant->position=$participants["position"];
+//        $participant->position=$participants["position"];
         $participant->working_hours=$participants["working_hours"];
         $participant->function=$participants["function"]["id"];
         $participant->save();
     }
     public function participantUpdate($id_project,array $participants){
-        $participant= $participants["id"];
+        $participant=Participant::find($participants["id"]);
         $participant->state_id=1;
         $participant->user_id=$participants["user"]["id"];
         $participant->project_id=$id_project;
         $participant->type=$participants["type"]["id"];
-        $participant->position=$participants["position"];
+       // $participant->position=$participants["position"];
         $participant->working_hours=$participants["working_hours"];
         $participant->function=$participants["function"]["id"];
         $participant->save();

@@ -25,7 +25,7 @@ Route::get('/project/{id}', [projectsController::class, 'edit']);
 Route::post('/project', [projectsController::class, 'create']);
 Route::post('/combo', [combosController::class, 'create']);
 Route::post('/beneficiary', [beneficiaryInstitutionController::class, 'search']);
-
+Route::post('/creator', [projectsController::class, 'creador']);
 //put
 Route::put('/project', [projectsController::class, 'update']);
 

@@ -21,8 +21,8 @@ class CreateCommunityStakeHolderTable extends Migration
             $table->string('lastname')->nullable();
             $table->string('identification');
             $table->string('position');
-            $table->foreignId('type')->constrained('ignug.catalogues');//rector estudiante coordinador profesor
-            $table->foreignId('function')->nullable()->constrained('ignug.catalogues');//rol asignado catalogo 
+            $table->foreignId('type')->constrained('ignug.catalogues');//coordinador o representate legal
+        //    $table->foreignId('function')->nullable()->constrained('ignug.catalogues');//rol asignado catalogo 
             $table->timestamps();
         });
     }

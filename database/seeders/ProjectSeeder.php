@@ -21,11 +21,11 @@ class ProjectSeeder extends Seeder
             'ruc'=>'1234567891',
             'name'=>"FUNDACION VISTA PARA TODOS",
             //'address'=>1, //fk propia
-            //
-            'legal_representative_name'=>"RODRIGO",
-            'legal_representative_lastname'=>"nogales",
-            'legal_representative_identification'=>1725485277,
-            'function'=>1,//CARGO
+            // //
+            // 'legal_representative_name'=>"RODRIGO",
+            // 'legal_representative_lastname'=>"nogales",
+            // 'legal_representative_identification'=>1725485277,
+            'function'=>"esatada",//CARGO
             //
             ]);
         
@@ -203,7 +203,7 @@ class ProjectSeeder extends Seeder
                 'position'=>'conserje',
                 'state_id'=>1,
                 'type'=>Catalogue::where('code','cargo_5')->first('id')->id,//
-                'function'=>1,
+                //'function'=>1,
                 'project_id'=>1
             ]);
             DB::connection('pgsql-community')->table('participants')->insert([

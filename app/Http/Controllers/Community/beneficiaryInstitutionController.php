@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Community\BeneficiaryInstitution;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Ignug\Address;
+
 
 class beneficiaryInstitutionController extends Controller
 {
@@ -21,15 +23,26 @@ class beneficiaryInstitutionController extends Controller
         $filePath = !!$beneficiary_institution["logo"] <> null?
         $beneficiary_institution["logo"]->storeAs('charitable_institution',  $beneficiary_institution["name"]. '.png', 'public')
         :null;  
+        //address
+        $address= new Address;
+        $address->location_id=$beneficiary_institution["address"]["location"]["id"];
+        $address->principal_street=$beneficiary_institution["address"]["main_street"];
+        $address->secondary_street=$beneficiary_institution["address"]["secondary_street"];
+        $address->state_id=1;
+        $address->save();
+        $fkadress=Address::where('principal_street',$beneficiary_institution["address"]["main_street"])
+            ->where("secondary_street",$beneficiary_institution["address"]["secondary_street"])
+            ->where("location_id",$beneficiary_institution["address"]["location"]["id"])
+            ->first();
+        //files
+
+        //institution 
         $CharitableInstitution= new BeneficiaryInstitution; 
         $CharitableInstitution->state_id=1;
         $CharitableInstitution->logo=$filePath;
         $CharitableInstitution->ruc=$beneficiary_institution["ruc"];
         $CharitableInstitution->name=$beneficiary_institution["name"];
-        $CharitableInstitution->address= $beneficiary_institution["address"];///aadress de la parroquia
-        $CharitableInstitution->legal_representative_name=$beneficiary_institution["legal_representative_name"];
-        $CharitableInstitution->legal_representative_lastname=$beneficiary_institution["legal_representative_lastname"];//boorar state-holder 
-        $CharitableInstitution->legal_representative_identification=$beneficiary_institution["legal_representative_identification"];
+        $CharitableInstitution->address=$fkadress;///aadress de la parroquia
         $CharitableInstitution->function=$beneficiary_institution["function"];
         $CharitableInstitution->save();
         return BeneficiaryInstitution::where('ruc', $beneficiary_institution["ruc"])->first()->id;
@@ -70,16 +83,19 @@ class beneficiaryInstitutionController extends Controller
          //img 
         $filePath = !!$beneficiary_institution["logo"] <> null?
         $beneficiary_institution["logo"]->storeAs('charitable_institution',  $beneficiary_institution["name"]. '.png', 'public')
-        :null;  
+        :null; 
+        //address
+        $address= Address::find($beneficiary_institution["address"]["id"]);
+        $address->location_id=$beneficiary_institution["address"]["location"]["id"];
+        $address->principal_street=$beneficiary_institution["address"]["main_street"];
+        $address->location=$beneficiary_institution["address"]["secondary_street"];
+        $address->save();
+        //institution 
         $CharitableInstitution= BeneficiaryInstitution::find($beneficiary_institution["id"]); 
         $CharitableInstitution->state_id=1;
         $CharitableInstitution->logo=$filePath;
         $CharitableInstitution->ruc=$beneficiary_institution["ruc"];
         $CharitableInstitution->name=$beneficiary_institution["name"];
-        $CharitableInstitution->address= $beneficiary_institution["address"];
-        $CharitableInstitution->legal_representative_name=$beneficiary_institution["legal_representative_name"];
-        $CharitableInstitution->legal_representative_lastname=$beneficiary_institution["legal_representative_lastname"];
-        $CharitableInstitution->legal_representative_identification=$beneficiary_institution["legal_representative_identification"];
         $CharitableInstitution->function=$beneficiary_institution["function"];
         $CharitableInstitution->save();
         return BeneficiaryInstitution::where('ruc', $beneficiary_institution["ruc"])->first()->id;

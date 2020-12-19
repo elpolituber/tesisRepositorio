@@ -21,9 +21,9 @@ class CreateCommunityBeneficiaryInstitutionsTable extends Migration
             $table->string('ruc',15);
             $table->text('name',300);
             $table->foreignId('address')->nullable()->constrained('ignug.address');//fk propia
-            $table->string('legal_representative_name',100);
-            $table->string('legal_representative_lastname',100);
-            $table->string('legal_representative_identification',100);
+            // $table->string('legal_representative_name',100);
+            // $table->string('legal_representative_lastname',100);
+            // $table->string('legal_representative_identification',100);
             $table->string('function')->nullable();
             $table->timestamps();
         });

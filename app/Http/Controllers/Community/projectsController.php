@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use App\Models\Community\Project;
 use App\Models\Community\Objetive;
 use App\Models\Authentication\Role;
+use App\Models\Ignug\Address;
+
 
 
 class projectsController extends Controller
@@ -75,7 +77,7 @@ class projectsController extends Controller
    $Project->beneficiary_institution=$fkCharitableInstitution;                 
    $Project->school_period=$request->school_period["id"];
    $Project->career_id=$request->career["id"];
-  //  //$Project->assigned_line_id=$request->assigned_line_id;
+    //$Project->assigned_line_id=$request->assigned_line_id;
    $Project->code=$request->code;
    $Project->title=$request->title;
    $Project->status_id= $request->status["id"];
@@ -105,14 +107,14 @@ class projectsController extends Controller
    //Objective
    for($con=0;$con<count($request->objetive);$con++){
     $objective=$request->objetive[$con];
-    $fkaims=$objective["children"] <> null ?
-    Objetive::where('description',$objective["description"])->first("id")->id : 
-    (object) array("id"=>null);
+    // $fkaims=$objective["children"]["description"] <> null ?
+    //  Objetive::where('description',$objective["children"]["description"])->first()->id : 
+    //  (object) array("id"=>null);
     $aims= new objetiveC;
     $aims->aimsCreate(
       $fkProject->id,
       $objective,
-      $fkaims
+      $fkaims=null
     );  
    }
   //ProjectActivities
@@ -310,7 +312,7 @@ class projectsController extends Controller
     
   }
   public function creador(Request $request){
-    $vista=count($request->objetive);//Role::all();   
+    $vista=$request->objetive[1]["children"]["description"];
     return $vista;
   }
 
