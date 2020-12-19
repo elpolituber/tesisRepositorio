@@ -105,16 +105,15 @@ class projectsController extends Controller
    //fk Project searh
    $fkProject=Project::where('code',$request->code)->first("id");
    //Objective
+   
    for($con=0;$con<count($request->objetive);$con++){
+    
     $objective=$request->objetive[$con];
-    // $fkaims=$objective["children"]["description"] <> null ?
-    //  Objetive::where('description',$objective["children"]["description"])->first()->id : 
-    //  (object) array("id"=>null);
+   
     $aims= new objetiveC;
     $aims->aimsCreate(
       $fkProject->id,
       $objective,
-      $fkaims=null
     );  
    }
   //ProjectActivities
@@ -187,8 +186,8 @@ class projectsController extends Controller
     //Objective
     for($con=0;$con<count($request->objetive);$con++){
       $objective=$request->objetive[$con];
-      $fkaims=$objective["children"] <> null ?
-      Objetive::where('description',$objective["description"])->first("id")->id : 
+      $fkaims=$objective["children"]["description"] <> null ?
+      Objetive::where('description',$objective["children"]["description"])->first("id") : 
       (object) array("id"=>null);
       $aims= new objetiveC;
       $aims->aimsUpdate(
@@ -231,20 +230,21 @@ class projectsController extends Controller
     // cambiar de estado de 1 a 2
     $Project=Project::find($id);
     $Project->state_id=2;
+    $Project->save();
       return "proyecto eliminado";
   }
   public function edit($id){
     $projects=Project::with(['frequency_activities'=>function($frequency_activity){$frequency_activity;}])
       ->with(['school_period'=>function($school){$school;}])
       ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
-        $BeneficiaryInstitution->with('state')
+        $BeneficiaryInstitution//->with('state')
         ->with(['address'=>function($address){$address;}]);
       }])
       ->with(['status'=>function($status){
        // $status->with('state');
       }])
       ->with(['career'=>function($career){
-        $career->with('state')
+        $career//->with('state')
           ->with(['modality'=>function($modality){$modality->with('state');}]);
       }])
       //->with('state')
@@ -253,20 +253,20 @@ class projectsController extends Controller
       }])
       ->with(['participant'=>function($participants){
          $participants//->with('state')
-         ->with(['user'=>function($user){$user->with('state');}])
-         ->with(['type'=>function($type){$type->with('state');}])
-         ->with(['function'=>function($function){$function->with('state');}]);
+         ->with(['user'=>function($user){$user;}])
+         ->with(['type'=>function($type){$type;}])
+         ->with(['function'=>function($function){$function;}]);
       }])
       ->with(['activities'=>function($activity){
-        $activity->with('state')
-        ->with(['type'=>function($type){$type->with('state');}]);
+        $activity//->with('state')
+        ->with(['type'=>function($type){$type;}]);
       }])
       ->with(['stake_holder'=>function($function){
-        $function->with('state')
+        $function//->with('state')
         ->with('type');
       }])
       ->with(['objetive'=>function($objetive){
-        $objetive->with('children')
+        $objetive//->with('children')
           ->with('type');
       }])
       ->where('id',$id)
@@ -312,8 +312,18 @@ class projectsController extends Controller
     
   }
   public function creador(Request $request){
-    $vista=$request->objetive[1]["children"]["description"];
-    return $vista;
+    $condicion=[
+      ["description","Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo"],
+    ["project_id",1],
+    ];
+    //$objective=$request->objetive[1];
+    // $fkaims=$objective["children"]["description"] <> null ?
+    //   Objetive::where('description',$objective["children"]["description"])->first(): 
+    //   (object) array("id"=>null);
+  //  $vista=$objective["children"]["description"] <> null? 
+    // Objetive::where('description',"Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo")->first():
+    // "hola";
+    return Objetive::where($condicion)->first();
   }
 
 }

@@ -352,35 +352,21 @@ class ProjectSeeder extends Seeder
                     }
             
             },
+          
             {
                 "indicator": "Número de estudiantes capacidades en el área de informática ",
                 "means_verification": [
                     "Listado de asistencia"
                 ],
-                "description":  "Analizar el estado general  de las maquinas mediante una revisión preliminar para verificar el estado y las condiciones de los equipos informáticos",
-                "type": {
-                    "id": 26
-                },
-                "children": 
-                    {
-                        "description": null
-                    }
-                
-            },
-            {
-                "indicator": "Número de estudiantes capacidades en el área de informática ",
-                "means_verification": [
-                    "Listado de asistencia"
-                ],
-                "description": "Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo",
+                "description": "Brindars una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo",
                 "type": {
                     "id": 25
                 },
-                "children": [
+                "children": 
                     {
-                        "description": null
+                        "description":  "Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo"
                     }
-                ]
+                
             }
         ]
     }

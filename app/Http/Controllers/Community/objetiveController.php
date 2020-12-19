@@ -64,7 +64,15 @@ class objetiveController extends Controller
         //
     }
 
-    public function aimsCreate($id_project,array $objective,$parent_code_id){
+    public function aimsCreate($id_project,array $objective){
+        $condicion=[
+            ["project_id",$id_project],
+            ["description",$objective["children"]["description"]],
+            
+          ]; 
+          $fkaims=$objective["children"]["description"] <> null ?
+            Objetive::where($condicion)->first()->id: 
+            null;
         $SpecificAim = new Objetive;
         $SpecificAim->state_id=1;
         $SpecificAim->project_id=$id_project;
@@ -72,7 +80,7 @@ class objetiveController extends Controller
         $SpecificAim->means_verification=$objective["means_verification"];
         $SpecificAim->description=$objective["description"];
         $SpecificAim->type=$objective["type"]["id"];
-        $SpecificAim->children=$parent_code_id;
+        $SpecificAim->children=$fkaims;
         $SpecificAim->save();
     }
     public function aimsUpdate($id_project,array $objective,$parent_code_id){
@@ -83,7 +91,7 @@ class objetiveController extends Controller
         $SpecificAim->means_verification=$objective["means_verification"];
         $SpecificAim->description=$objective["description"];
         $SpecificAim->type=$objective["type"]["id"];
-        $SpecificAim->children=$parent_code_id;
+        $SpecificAim->children=$parent_code_id->id;
         $SpecificAim->save();
       }
 }
