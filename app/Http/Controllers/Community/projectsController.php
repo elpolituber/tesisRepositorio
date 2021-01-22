@@ -34,7 +34,8 @@ class projectsController extends Controller
       }])
       ->with(['career'=>function($career){
         $career->with('state')
-          ->with(['modality'=>function($modality){$modality->with('state');}]);
+          ->with(['modality'=>function($modality){$modality->with('state');}])
+          ->with('institution');
       }])
       //->with('state')
       ->with(['location'=>function($location){
@@ -236,7 +237,7 @@ class projectsController extends Controller
   public function edit($id){
     $projects=Project::with(['frequency_activities'=>function($frequency_activity){$frequency_activity;}])
       ->with(['school_period'=>function($school){$school;}])
-      ->with(['BeneficiaryInstitution'=>function($BeneficiaryInstitution){
+      ->with(['beneficiaryInstitution'=>function($BeneficiaryInstitution){
         $BeneficiaryInstitution//->with('state')
         ->with(['address'=>function($address){$address;}]);
       }])
@@ -245,7 +246,8 @@ class projectsController extends Controller
       }])
       ->with(['career'=>function($career){
         $career//->with('state')
-          ->with(['modality'=>function($modality){$modality->with('state');}]);
+          ->with(['modality'=>function($modality){$modality->with('state');}])
+          ->with('institution');
       }])
       //->with('state')
       ->with(['location'=>function($location){
@@ -316,16 +318,16 @@ class projectsController extends Controller
       ["description","Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo"],
     ["project_id",1],
     ];
-    //$objective=$request->objetive[1];
-    // $fkaims=$objective["children"]["description"] <> null ?
-    //   Objetive::where('description',$objective["children"]["description"])->first(): 
-    //   (object) array("id"=>null);
-  //  $vista=$objective["children"]["description"] <> null? 
-    // Objetive::where('description',"Brindar una capacitación en ofimática básica a niños de 8 a 12 años mediante talleres y trabajos dirigidas para su desarrollo educativo")->first():
-    // "hola";
     return Objetive::where($condicion)->first();
   }
-
+  public function pdf($id){
+    //https://styde.net/genera-pdfs-en-laravel-con-el-componente-dompdf/
+    $data=$this->edit($id);
+    return $pdf=\PDF::loadView('pdf/convenio',compact('data'))
+    ->stream('convenio.pdf');
+   // return $pdf->download('prueba.pdf');
+    
+  }
 }
 
     /**

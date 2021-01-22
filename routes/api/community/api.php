@@ -20,6 +20,7 @@ use App\Http\Controllers\Community\projectsController;
 Route::get('/combo', [combosController::class, 'show']);
 Route::get('/project', [projectsController::class, 'show']);
 Route::get('/project/{id}', [projectsController::class, 'edit']);
+Route::get('/pdf/{id}', [projectsController::class, 'pdf']);
 
 //post
 Route::post('/project', [projectsController::class, 'create']);

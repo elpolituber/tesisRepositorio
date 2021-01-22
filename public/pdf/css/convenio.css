@@ -1,0 +1,63 @@
+@page {
+    margin: 0cm 0cm;
+    font-family: 'Times New Roman';
+    text-align: justify;
+}
+
+body {
+    margin: 3cm 2cm 2.7cm;
+}
+header {
+    position: fixed;
+    top: 0cm;
+    left: 0cm;
+    right: 0cm;
+    height: 2cm;
+    background-color: #f5f4f4ec;
+    color: white;
+    /* text-align: center; */
+    
+}
+main{
+    margin-bottom: 1cm;
+    line-height : 20px;
+}
+.trheader,.tdheader{
+    padding: 20px;
+    text-align:center;
+}
+
+
+.cabezaIzquierda{
+    margin-top: 30px;
+    text-align: right;
+}
+footer {
+ position: fixed;
+    bottom: 0cm;
+    left: 0cm;
+    right: 0cm;
+    height: 2.7cm;
+    background-color:rgba(135, 206, 206, 0.76);
+    color: rgba(255, 255, 255, 0.911);
+    
+    text-align: center;
+ 
+}
+.pieIzquierda{
+    position: relative;
+    text-align: right;
+    padding: 30px;
+     
+}
+
+/* fomato de letras */
+.kursiva{
+    font-style: italic;
+}
+th,td{
+    padding: 50px;
+}
+th{
+    text-align: left,justify;
+}
